@@ -66,11 +66,11 @@ fun MainScreen() {
         HomeTabScreen(
           viewModel = hiltViewModel(),
           tabStateHolder = tabStateHolder,
-          selectItem = { tab, index ->
+          selectItem = { tab, id ->
             when (tab) {
-              MainScreenHomeTab.MOVIE -> navController.navigate("${NavScreen.MovieDetails.route}/$index")
-              MainScreenHomeTab.TV -> navController.navigate("${NavScreen.TvDetails.route}/$index")
-              MainScreenHomeTab.PERSON -> navController.navigate("${NavScreen.PersonDetails.route}/$index")
+              MainScreenHomeTab.MOVIE -> navController.navigate("${NavScreen.MovieDetails.route}/$id")
+              MainScreenHomeTab.TV -> navController.navigate("${NavScreen.TvDetails.route}/$id")
+              MainScreenHomeTab.PERSON -> navController.navigate("${NavScreen.PersonDetails.route}/$id")
             }
           }
         )
