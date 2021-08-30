@@ -43,9 +43,10 @@ class DiscoverRepository constructor(
   fun loadMovies(page: Int, success: () -> Unit, error: () -> Unit) = flow {
     var movies = movieDao.getMovieList(page)
     if (movies.isEmpty()) {
-      val response = discoverService.fetchDiscoverMovie(page)
+      val params = mapOf("page" to page.toString())
+      val response = discoverService.fetchDiscoverMovie(params)
       response.suspendOnSuccess {
-        movies = data.results
+        movies = data.result!!.list
         movies.forEach { it.page = page }
         movieDao.insertMovieList(movies)
         emit(movies)

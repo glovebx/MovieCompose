@@ -123,7 +123,8 @@ fun MoviePoster(
 
       var palette by remember { mutableStateOf<Palette?>(null) }
       NetworkImage(
-        networkUrl = Api.getPosterPath(movie.poster_path),
+//        networkUrl = Api.getPosterPath(movie.poster_path),
+        networkUrl = movie.coverUrl,
         modifier = Modifier
           .height(240.dp)
           .constrainAs(image) {

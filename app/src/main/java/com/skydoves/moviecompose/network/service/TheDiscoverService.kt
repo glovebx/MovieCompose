@@ -18,8 +18,11 @@ package com.skydoves.moviecompose.network.service
 
 import com.skydoves.moviecompose.models.network.DiscoverMovieResponse
 import com.skydoves.moviecompose.models.network.DiscoverTvResponse
+import com.skydoves.moviecompose.models.network.JsonRPCResponse
 import com.skydoves.sandwich.ApiResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface TheDiscoverService {
@@ -33,8 +36,8 @@ interface TheDiscoverService {
    *
    *  @return [DiscoverMovieResponse] response
    */
-  @GET("/3/discover/movie?language=en&sort_by=popularity.desc")
-  suspend fun fetchDiscoverMovie(@Query("page") page: Int): ApiResponse<DiscoverMovieResponse>
+  @POST("/odoostore/v1/app/search")
+  suspend fun fetchDiscoverMovie(@Body params: Map<String, String>): ApiResponse<JsonRPCResponse<DiscoverMovieResponse>>
 
   /**
    * [Tv Discover](https://developers.themoviedb.org/3/discover/tv-discover)

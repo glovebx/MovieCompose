@@ -18,29 +18,32 @@ package com.skydoves.moviecompose.models.entities
 
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.skydoves.moviecompose.models.Image
 import com.skydoves.moviecompose.models.Keyword
 import com.skydoves.moviecompose.models.Review
 import com.skydoves.moviecompose.models.Video
 
 @Immutable
-@Entity(primaryKeys = [("id")])
+@Entity//(primaryKeys = [("id")])
 data class Movie(
+  @PrimaryKey(autoGenerate = true)
+  val id: Long,
   var page: Int,
+
+  val title: String,
+  val coverUrl: String,
+  val url: String,
+  val desc: String,
+  val price: String,
+  val currency: String,
+  val vendor: String,
+  val verified: String,
+  val voteAverage: Float,
+  val releaseDate: String?,
+
   var keywords: List<Keyword>? = ArrayList(),
   var videos: List<Video>? = ArrayList(),
+  var images: List<Image>? = ArrayList(),
   var reviews: List<Review>? = ArrayList(),
-  val poster_path: String?,
-  val adult: Boolean,
-  val overview: String,
-  val release_date: String?,
-  val genre_ids: List<Int>,
-  val id: Long,
-  val original_title: String,
-  val original_language: String,
-  val title: String,
-  val backdrop_path: String?,
-  val popularity: Float,
-  val vote_count: Int,
-  val video: Boolean,
-  val vote_average: Float
 )

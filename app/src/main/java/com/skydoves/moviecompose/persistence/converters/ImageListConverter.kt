@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package com.skydoves.moviecompose.models.network
+package com.skydoves.moviecompose.persistence.converters
 
-import androidx.compose.runtime.Immutable
-import com.skydoves.moviecompose.models.NetworkResponseModel
-import com.skydoves.moviecompose.models.entities.Movie
+import androidx.room.TypeConverter
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.skydoves.moviecompose.models.Image
 
-@Immutable
-data class DiscoverMovieResponse(
-  val code: Int,
-  val message: String,
-  val page: Int,
-  val list: List<Movie>
-) : NetworkResponseModel
+open class ImageListConverter {
+  @TypeConverter
+  fun fromString(value: String): List<Image>? {
+    val listType = object : TypeToken<List<Image>>() {}.type
+    return Gson().fromJson<List<Image>>(value, listType)
+  }
+
+  @TypeConverter
+  fun fromList(list: List<Image>?): String {
+    val gson = Gson()
+    return gson.toJson(list)
+  }
+}

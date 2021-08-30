@@ -22,11 +22,7 @@ import androidx.room.TypeConverters
 import com.skydoves.moviecompose.models.entities.Movie
 import com.skydoves.moviecompose.models.entities.Person
 import com.skydoves.moviecompose.models.entities.Tv
-import com.skydoves.moviecompose.persistence.converters.IntegerListConverter
-import com.skydoves.moviecompose.persistence.converters.KeywordListConverter
-import com.skydoves.moviecompose.persistence.converters.ReviewListConverter
-import com.skydoves.moviecompose.persistence.converters.StringListConverter
-import com.skydoves.moviecompose.persistence.converters.VideoListConverter
+import com.skydoves.moviecompose.persistence.converters.*
 
 @Database(
   entities = [(Movie::class), (Tv::class), (Person::class)],
@@ -35,7 +31,7 @@ import com.skydoves.moviecompose.persistence.converters.VideoListConverter
 @TypeConverters(
   value = [
     (StringListConverter::class), (IntegerListConverter::class),
-    (KeywordListConverter::class), (VideoListConverter::class), (ReviewListConverter::class)
+    (KeywordListConverter::class), (ImageListConverter::class), (VideoListConverter::class), (ReviewListConverter::class)
   ]
 )
 abstract class AppDatabase : RoomDatabase() {

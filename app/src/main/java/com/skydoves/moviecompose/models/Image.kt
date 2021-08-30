@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.skydoves.moviecompose.models.network
+package com.skydoves.moviecompose.models
 
 import androidx.compose.runtime.Immutable
-import com.skydoves.moviecompose.models.NetworkResponseModel
-import com.skydoves.moviecompose.models.entities.Movie
 
 @Immutable
-data class DiscoverMovieResponse(
-  val code: Int,
-  val message: String,
-  val page: Int,
-  val list: List<Movie>
-) : NetworkResponseModel
+data class Image(
+  val id: String,
+  val name: String,
+  val site: String,
+  val key: String,
+  val size: Int,
+  val type: String
+)

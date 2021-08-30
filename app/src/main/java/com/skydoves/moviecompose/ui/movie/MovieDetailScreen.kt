@@ -118,7 +118,8 @@ private fun MovieDetailHeader(
 
     var palette by remember { mutableStateOf<Palette?>(null) }
     NetworkImage(
-      networkUrl = Api.getBackdropPath(movie?.backdrop_path),
+//      networkUrl = Api.getBackdropPath(movie?.backdrop_path),
+      networkUrl = movie?.coverUrl,
       circularReveal = CircularReveal(duration = 300),
       shimmerParams = null,
       bitmapPalette = BitmapPalette {
@@ -146,7 +147,7 @@ private fun MovieDetailHeader(
     Spacer(modifier = Modifier.height(6.dp))
 
     Text(
-      text = "Release Date: ${movie?.release_date}",
+      text = "Release Date: ${movie?.releaseDate}",
       style = MaterialTheme.typography.body1,
       color = Color.White,
       textAlign = TextAlign.Center,
@@ -161,7 +162,7 @@ private fun MovieDetailHeader(
     Spacer(modifier = Modifier.height(8.dp))
 
     RatingBar(
-      rating = (movie?.vote_average ?: 0f) / 2f,
+      rating = (movie?.voteAverage ?: 0f) / 2f,
       color = Color(palette?.vibrantSwatch?.rgb ?: 0),
       modifier = Modifier
         .height(15.dp)
@@ -330,7 +331,7 @@ private fun MovieDetailSummary(
       Spacer(modifier = Modifier.height(12.dp))
 
       Text(
-        text = movie?.overview ?: "",
+        text = movie?.desc ?: "",
         style = MaterialTheme.typography.body1,
         color = Color.White,
         fontWeight = FontWeight.Bold,
