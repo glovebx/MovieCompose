@@ -94,7 +94,7 @@ class MainViewModel @Inject constructor(
   init {
     viewModelScope.launch(Dispatchers.IO) {
       newMovieFlow.collectLatest {
-        movies.value.addAll(it)
+          movies.value.addAll(it?.list)
       }
     }
 

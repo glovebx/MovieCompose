@@ -17,6 +17,7 @@
 package com.skydoves.moviecompose.repository
 
 import androidx.annotation.WorkerThread
+import com.skydoves.moviecompose.models.network.DiscoverMovieResult
 import com.skydoves.moviecompose.network.service.TheDiscoverService
 import com.skydoves.moviecompose.persistence.MovieDao
 import com.skydoves.moviecompose.persistence.TvDao
@@ -41,21 +42,28 @@ class DiscoverRepository constructor(
 
   @WorkerThread
   fun loadMovies(page: Int, success: () -> Unit, error: () -> Unit) = flow {
-    var movies = movieDao.getMovieList(page)
-    if (movies.isEmpty()) {
+//    var movies = movieDao.getMovieList(page)
+//    if (movies.isEmpty()) {
       val params = mapOf("page" to page.toString())
       val response = discoverService.fetchDiscoverMovie(params)
       response.suspendOnSuccess {
-        movies = data.result!!.list
-        movies.forEach { it.page = page }
-        movieDao.insertMovieList(movies)
-        emit(movies)
+//        data.result?.run {
+//          var movies = this.list
+//          movies.forEach { it.page = page }
+//          movieDao.insertMovieList(movies)
+//        }
+          if (data.error != null) {
+              // 从error里面抽取出错误消息
+              emit(DiscoverMovieResult(data.error!!.code, data.error!!.message))
+          } else {
+              emit(data.result!!)
+          }
       }.onError {
         error()
       }.onException { error() }
-    } else {
-      emit(movies)
-    }
+//    } else {
+//      emit(movies)
+//    }
   }.onCompletion { success() }.flowOn(Dispatchers.IO)
 
   @WorkerThread

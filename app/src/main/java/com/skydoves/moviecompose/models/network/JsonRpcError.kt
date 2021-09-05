@@ -17,13 +17,31 @@
 package com.skydoves.moviecompose.models.network
 
 import androidx.compose.runtime.Immutable
-import com.skydoves.moviecompose.models.NetworkResponseModel
-import com.skydoves.moviecompose.models.entities.Movie
 
 @Immutable
-data class DiscoverMovieResponse(
-  val code: Int,
-  val message: String,
-  val page: Int,
-  val list: List<Movie>
-) : NetworkResponseModel
+class JsonRpcError {
+  var code: Long = 0
+  var message: String = ""
+  var data: Any? = null
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as JsonRpcError
+
+    if (code != other.code) return false
+    if (message != other.message) return false
+    if (data != other.data) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = code.hashCode()
+    result = 31 * result + message.hashCode()
+    result = 31 * result + (data?.hashCode() ?: 0)
+    return result
+  }
+
+}
