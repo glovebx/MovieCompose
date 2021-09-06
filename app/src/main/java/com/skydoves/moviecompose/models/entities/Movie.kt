@@ -37,10 +37,17 @@ data class Movie(
   val desc: String,
   val price: String,
   val currency: String,
-  val vendor: String,
+  val authorName: String,
+  val authorWebsite: String,
   val verified: String,
   val voteAverage: Float,
   val releaseDate: String?,
+
+  var technicalName: String?,
+  var license: String?,
+  var downloadNum: Int,
+  var availableVersions: List<String>? = ArrayList(),
+  var descImages: List<String>? = ArrayList(),
 
   var keywords: List<Keyword>? = ArrayList(),
   var videos: List<Video>? = ArrayList(),
