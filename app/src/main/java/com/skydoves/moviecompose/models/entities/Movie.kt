@@ -29,23 +29,25 @@ import com.skydoves.moviecompose.models.Video
 data class Movie(
   @PrimaryKey(autoGenerate = true)
   val id: Long,
-  var page: Int,
 
   val title: String,
   val coverUrl: String,
+  // unique
   val url: String,
+  // MD5之后的字符串
+  val url5: String,
   val desc: String,
   val price: String,
   val currency: String,
   val authorName: String,
-  val authorWebsite: String,
   val verified: String,
   val voteAverage: Float,
   val releaseDate: String?,
 
+  val authorWebsite: String?,
   var technicalName: String?,
   var license: String?,
-  var downloadNum: Int,
+  var downloadNum: Int?,
   var availableVersions: List<String>? = ArrayList(),
   var descImages: List<String>? = ArrayList(),
 

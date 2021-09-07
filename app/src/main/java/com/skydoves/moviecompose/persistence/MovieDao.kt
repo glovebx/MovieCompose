@@ -31,9 +31,9 @@ interface MovieDao {
   @Update
   suspend fun updateMovie(movie: Movie)
 
-  @Query("SELECT * FROM MOVIE WHERE id = :id_")
-  suspend fun getMovie(id_: Long): Movie
+  @Query("SELECT * FROM MOVIE WHERE url5 = :url5_")
+  suspend fun getMovie(url5_: String): Movie
 
-  @Query("SELECT * FROM Movie WHERE page = :page_")
-  suspend fun getMovieList(page_: Int): List<Movie>
+//  @Query("SELECT * FROM Movie WHERE page = :page_")
+//  suspend fun getMovieList(page_: Int): List<Movie>
 }

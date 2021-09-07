@@ -56,11 +56,11 @@ class PeopleRepository constructor(
   }.onCompletion { success() }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadPersonDetail(id: Long, success: () -> Unit) = flow {
-    val person = peopleDao.getPerson(id)
+  fun loadPersonDetail(id: String, success: () -> Unit) = flow {
+    val person = peopleDao.getPerson(id.toLong())
     var personDetail = person.personDetail
     if (personDetail == null) {
-      val response = peopleService.fetchPersonDetail(id)
+      val response = peopleService.fetchPersonDetail(id.toLong())
       response.suspendOnSuccess {
         personDetail = data
         person.personDetail = personDetail
@@ -73,8 +73,8 @@ class PeopleRepository constructor(
   }.onCompletion { success() }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadPersonById(id: Long) = flow {
-    val person = peopleDao.getPerson(id)
+  fun loadPersonById(id: String) = flow {
+    val person = peopleDao.getPerson(id.toLong())
     emit(person)
   }.flowOn(Dispatchers.IO)
 }

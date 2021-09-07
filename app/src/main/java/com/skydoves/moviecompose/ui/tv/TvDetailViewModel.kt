@@ -32,7 +32,7 @@ class TvDetailViewModel @Inject constructor(
   private val tvRepository: TvRepository
 ) : ViewModel() {
 
-  private val tvIdSharedFlow: MutableSharedFlow<Long> = MutableSharedFlow(replay = 1)
+  private val tvIdSharedFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
 
   val tvFlow = tvIdSharedFlow.flatMapLatest {
     tvRepository.loadTvById(it)
@@ -54,5 +54,5 @@ class TvDetailViewModel @Inject constructor(
     Timber.d("Injection TvDetailViewModel")
   }
 
-  fun fetchTvDetailsById(id: Long) = tvIdSharedFlow.tryEmit(id)
+  fun fetchTvDetailsById(id: String) = tvIdSharedFlow.tryEmit(id)
 }

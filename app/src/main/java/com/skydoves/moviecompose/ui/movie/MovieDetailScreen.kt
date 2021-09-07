@@ -67,6 +67,7 @@ import com.skydoves.moviecompose.models.Keyword
 import com.skydoves.moviecompose.models.Review
 import com.skydoves.moviecompose.models.Video
 import com.skydoves.moviecompose.models.entities.Movie
+import com.skydoves.moviecompose.models.network.MovieResult
 import com.skydoves.moviecompose.network.Api
 import com.skydoves.moviecompose.network.compose.NetworkImage
 import com.skydoves.moviecompose.ui.custom.AppBarWithArrow
@@ -77,14 +78,14 @@ import com.skydoves.whatif.whatIfNotNullOrEmpty
 
 @Composable
 fun MovieDetailScreen(
-  posterId: Long,
+  posterUrl: String,
   viewModel: MovieDetailViewModel,
   pressOnBack: () -> Unit
 ) {
-  val movie: Movie? by viewModel.movieFlow.collectAsState(initial = null)
+  val movieResult: MovieResult? by viewModel.movieFlow.collectAsState(initial = null)
 
-  LaunchedEffect(key1 = posterId) {
-    viewModel.fetchMovieDetailsById(posterId)
+  LaunchedEffect(key1 = posterUrl) {
+    viewModel.fetchMovieDetailsById(posterUrl)
   }
 
   Column(
@@ -94,7 +95,7 @@ fun MovieDetailScreen(
       .fillMaxSize(),
   ) {
 
-    AppBarWithArrow(movie?.title, pressOnBack)
+    AppBarWithArrow(movieResult?.data?.title, pressOnBack)
 
     MovieDetailHeader(viewModel)
 
@@ -112,14 +113,14 @@ fun MovieDetailScreen(
 private fun MovieDetailHeader(
   viewModel: MovieDetailViewModel
 ) {
-  val movie: Movie? by viewModel.movieFlow.collectAsState(initial = null)
+  val movieResult: MovieResult? by viewModel.movieFlow.collectAsState(initial = null)
 
   Column {
 
     var palette by remember { mutableStateOf<Palette?>(null) }
     NetworkImage(
 //      networkUrl = Api.getBackdropPath(movie?.backdrop_path),
-      networkUrl = movie?.coverUrl,
+      networkUrl = movieResult?.data?.coverUrl,
       circularReveal = CircularReveal(duration = 300),
       shimmerParams = null,
       bitmapPalette = BitmapPalette {
@@ -132,7 +133,7 @@ private fun MovieDetailHeader(
     Spacer(modifier = Modifier.height(25.dp))
 
     Text(
-      text = movie?.title ?: "",
+      text = movieResult?.data?.title ?: "",
       style = MaterialTheme.typography.h5,
       color = Color.White,
       textAlign = TextAlign.Center,
@@ -147,7 +148,7 @@ private fun MovieDetailHeader(
     Spacer(modifier = Modifier.height(6.dp))
 
     Text(
-      text = "Release Date: ${movie?.releaseDate}",
+      text = "Release Date: ${movieResult?.data?.releaseDate}",
       style = MaterialTheme.typography.body1,
       color = Color.White,
       textAlign = TextAlign.Center,
@@ -162,7 +163,7 @@ private fun MovieDetailHeader(
     Spacer(modifier = Modifier.height(8.dp))
 
     RatingBar(
-      rating = (movie?.voteAverage ?: 0f) / 2f,
+      rating = (movieResult?.data?.voteAverage ?: 0f) / 2f,
       color = Color(palette?.vibrantSwatch?.rgb ?: 0),
       modifier = Modifier
         .height(15.dp)
@@ -307,7 +308,7 @@ private fun VideoThumbnail(
 private fun MovieDetailSummary(
   viewModel: MovieDetailViewModel
 ) {
-  val movie: Movie? by viewModel.movieFlow.collectAsState(initial = null)
+  val movieResult: MovieResult? by viewModel.movieFlow.collectAsState(initial = null)
   val keywords by viewModel.keywordListFlow.collectAsState(listOf())
 
   keywords.whatIfNotNullOrEmpty {
@@ -331,7 +332,7 @@ private fun MovieDetailSummary(
       Spacer(modifier = Modifier.height(12.dp))
 
       Text(
-        text = movie?.desc ?: "",
+        text = movieResult?.data?.desc ?: "",
         style = MaterialTheme.typography.body1,
         color = Color.White,
         fontWeight = FontWeight.Bold,

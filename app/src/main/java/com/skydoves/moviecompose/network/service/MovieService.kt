@@ -16,14 +16,17 @@
 
 package com.skydoves.moviecompose.network.service
 
-import com.skydoves.moviecompose.models.network.KeywordListResponse
-import com.skydoves.moviecompose.models.network.ReviewListResponse
-import com.skydoves.moviecompose.models.network.VideoListResponse
+import com.skydoves.moviecompose.models.network.*
 import com.skydoves.sandwich.ApiResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface MovieService {
+  @POST("/odoostore/v1/app/detail")
+  suspend fun fetchMovie(@Body params: Map<String, String>): ApiResponse<JsonRpcResponse<MovieResult>>
+
   /**
    * [Movie Keywords](https://developers.themoviedb.org/3/movies/get-movie-keywords)
    *
@@ -34,7 +37,7 @@ interface MovieService {
    * @return [KeywordListResponse] response
    */
   @GET("/3/movie/{movie_id}/keywords")
-  suspend fun fetchKeywords(@Path("movie_id") id: Long): ApiResponse<KeywordListResponse>
+  suspend fun fetchKeywords(@Path("movie_id") id: String): ApiResponse<KeywordListResponse>
 
   /**
    * [Movie Videos](https://developers.themoviedb.org/3/movies/get-movie-videos)
@@ -46,7 +49,7 @@ interface MovieService {
    * @return [VideoListResponse] response
    */
   @GET("/3/movie/{movie_id}/videos")
-  suspend fun fetchVideos(@Path("movie_id") id: Long): ApiResponse<VideoListResponse>
+  suspend fun fetchVideos(@Path("movie_id") id: String): ApiResponse<VideoListResponse>
 
   /**
    * [Movie Reviews](https://developers.themoviedb.org/3/movies/get-movie-reviews)
@@ -58,5 +61,5 @@ interface MovieService {
    * @return [ReviewListResponse] response
    */
   @GET("/3/movie/{movie_id}/reviews")
-  suspend fun fetchReviews(@Path("movie_id") id: Long): ApiResponse<ReviewListResponse>
+  suspend fun fetchReviews(@Path("movie_id") id: String): ApiResponse<ReviewListResponse>
 }

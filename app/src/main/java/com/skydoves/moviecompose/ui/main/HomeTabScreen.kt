@@ -43,7 +43,7 @@ import com.skydoves.moviecompose.ui.tv.TvScreen
 fun HomeTabScreen(
   viewModel: MainViewModel,
   tabStateHolder: HomeTabStateHolder,
-  selectItem: (MainScreenHomeTab, Long) -> Unit
+  selectItem: (MainScreenHomeTab, String) -> Unit
 ) {
   val selectedTab by viewModel.selectedTab
   val tabs = MainScreenHomeTab.values()

@@ -60,7 +60,7 @@ import com.skydoves.moviecompose.ui.main.MainViewModel
 @Composable
 fun MovieScreen(
   viewModel: MainViewModel,
-  selectPoster: (MainScreenHomeTab, Long) -> Unit,
+  selectPoster: (MainScreenHomeTab, String) -> Unit,
   lazyListState: LazyListState,
   modifier: Modifier = Modifier
 ) {
@@ -103,7 +103,7 @@ fun MovieScreen(
 @Composable
 fun MoviePoster(
   movie: Movie,
-  selectPoster: (MainScreenHomeTab, Long) -> Unit,
+  selectPoster: (MainScreenHomeTab, String) -> Unit,
   modifier: Modifier = Modifier
 ) {
   Surface(
@@ -112,7 +112,7 @@ fun MoviePoster(
       .height(290.dp)
       .clickable(
         onClick = {
-          selectPoster(MainScreenHomeTab.MOVIE, movie.id)
+          selectPoster(MainScreenHomeTab.MOVIE, movie.url5)
         }
       ),
     color = MaterialTheme.colors.onBackground

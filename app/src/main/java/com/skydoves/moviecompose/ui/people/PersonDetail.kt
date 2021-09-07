@@ -54,14 +54,14 @@ import com.skydoves.whatif.whatIfNotNullOrEmpty
 
 @Composable
 fun PersonDetailScreen(
-  personId: Long,
+  url: String,
   viewModel: PersonDetailViewModel,
   pressOnBack: () -> Unit
 ) {
   val person by viewModel.personFlow.collectAsState(initial = null)
 
-  LaunchedEffect(key1 = personId) {
-    viewModel.fetchPersonDetailsById(personId)
+  LaunchedEffect(key1 = url) {
+    viewModel.fetchPersonDetailsById(url)
   }
 
   Column(

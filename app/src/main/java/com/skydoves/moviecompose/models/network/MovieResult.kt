@@ -14,33 +14,14 @@
  * limitations under the License.
  */
 
-package com.skydoves.moviecompose.ui.navigation
+package com.skydoves.moviecompose.models.network
 
 import androidx.compose.runtime.Immutable
+import com.skydoves.moviecompose.models.entities.Movie
 
 @Immutable
-sealed class NavScreen(val route: String) {
-
-  object Home : NavScreen("Home")
-
-  object MovieDetails : NavScreen("MovieDetails") {
-
-    const val routeWithArgument: String = "MovieDetails/{url}"
-
-    const val argument0: String = "url"
-  }
-
-  object TvDetails : NavScreen("TvDetails") {
-
-    const val routeWithArgument: String = "TvDetails/{url}"
-
-    const val argument0: String = "url"
-  }
-
-  object PersonDetails : NavScreen("PersonDetails") {
-
-    const val routeWithArgument: String = "PersonDetails/{url}"
-
-    const val argument0: String = "url"
-  }
-}
+data class MovieResult(
+  val code: Long,
+  val message: String,
+  val data: Movie? = null
+)

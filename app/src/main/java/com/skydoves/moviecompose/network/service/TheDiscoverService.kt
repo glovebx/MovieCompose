@@ -36,7 +36,7 @@ interface TheDiscoverService {
    *
    *  @return [DiscoverMovieResult] response
    */
-  @POST("/odoostore/v1/app/search1")
+  @POST("/odoostore/v1/app/search")
   suspend fun fetchDiscoverMovie(@Body params: Map<String, String>): ApiResponse<JsonRpcResponse<DiscoverMovieResult>>
 
   /**

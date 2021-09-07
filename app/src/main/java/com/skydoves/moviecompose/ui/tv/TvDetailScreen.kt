@@ -77,14 +77,14 @@ import com.skydoves.whatif.whatIfNotNullOrEmpty
 
 @Composable
 fun TvDetailScreen(
-  posterId: Long,
+  url: String,
   viewModel: TvDetailViewModel,
   pressOnBack: () -> Unit
 ) {
   val tv: Tv? by viewModel.tvFlow.collectAsState(initial = null)
 
-  LaunchedEffect(key1 = posterId) {
-    viewModel.fetchTvDetailsById(posterId)
+  LaunchedEffect(key1 = url) {
+    viewModel.fetchTvDetailsById(url)
   }
 
   Column(

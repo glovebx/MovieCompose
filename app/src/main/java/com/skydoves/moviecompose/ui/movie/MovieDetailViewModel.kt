@@ -32,10 +32,10 @@ class MovieDetailViewModel @Inject constructor(
   private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-  private val movieIdSharedFlow: MutableSharedFlow<Long> = MutableSharedFlow(replay = 1)
+  private val movieIdSharedFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
 
   val movieFlow = movieIdSharedFlow.flatMapLatest {
-    movieRepository.loadMovieById(it)
+    movieRepository.loadMovieByUrl(it)
   }
 
   val videoListFlow = movieIdSharedFlow.flatMapLatest {
@@ -54,5 +54,5 @@ class MovieDetailViewModel @Inject constructor(
     Timber.d("Injection MovieDetailViewModel")
   }
 
-  fun fetchMovieDetailsById(id: Long) = movieIdSharedFlow.tryEmit(id)
+  fun fetchMovieDetailsById(url5: String) = movieIdSharedFlow.tryEmit(url5)
 }

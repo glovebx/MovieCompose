@@ -57,7 +57,7 @@ import com.skydoves.moviecompose.ui.theme.background800
 @Composable
 fun PeopleScreen(
   viewModel: MainViewModel,
-  selectPerson: (MainScreenHomeTab, Long) -> Unit,
+  selectPerson: (MainScreenHomeTab, String) -> Unit,
   lazyListState: LazyListState,
   modifier: Modifier = Modifier
 ) {
@@ -101,7 +101,7 @@ fun PeopleScreen(
 @Composable
 fun PersonCard(
   person: Person,
-  selectPerson: (MainScreenHomeTab, Long) -> Unit,
+  selectPerson: (MainScreenHomeTab, String) -> Unit,
   modifier: Modifier = Modifier
 ) {
   Surface(
@@ -109,7 +109,7 @@ fun PersonCard(
       .height(200.dp)
       .padding(4.dp)
       .clickable(
-        onClick = { selectPerson(MainScreenHomeTab.PERSON, person.id) }
+        onClick = { selectPerson(MainScreenHomeTab.PERSON, person.name) }
       ),
     color = background800,
     elevation = 8.dp,

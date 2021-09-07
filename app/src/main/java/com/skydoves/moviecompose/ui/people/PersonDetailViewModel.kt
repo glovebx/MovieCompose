@@ -34,7 +34,7 @@ class PersonDetailViewModel @Inject constructor(
   private val peopleRepository: PeopleRepository
 ) : ViewModel() {
 
-  private val personIdSharedFlow: MutableSharedFlow<Long> = MutableSharedFlow(replay = 1)
+  private val personIdSharedFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
 
   val personFlow = personIdSharedFlow.flatMapLatest {
     peopleRepository.loadPersonById(it)
@@ -49,5 +49,5 @@ class PersonDetailViewModel @Inject constructor(
     Timber.d("Injection PersonDetailViewModel")
   }
 
-  fun fetchPersonDetailsById(id: Long) = personIdSharedFlow.tryEmit(id)
+  fun fetchPersonDetailsById(id: String) = personIdSharedFlow.tryEmit(id)
 }

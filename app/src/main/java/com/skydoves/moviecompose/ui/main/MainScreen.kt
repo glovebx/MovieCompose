@@ -66,11 +66,11 @@ fun MainScreen() {
         HomeTabScreen(
           viewModel = hiltViewModel(),
           tabStateHolder = tabStateHolder,
-          selectItem = { tab, id ->
+          selectItem = { tab, url ->
             when (tab) {
-              MainScreenHomeTab.MOVIE -> navController.navigate("${NavScreen.MovieDetails.route}/$id")
-              MainScreenHomeTab.TV -> navController.navigate("${NavScreen.TvDetails.route}/$id")
-              MainScreenHomeTab.PERSON -> navController.navigate("${NavScreen.PersonDetails.route}/$id")
+              MainScreenHomeTab.MOVIE -> navController.navigate("${NavScreen.MovieDetails.route}/$url")
+              MainScreenHomeTab.TV -> navController.navigate("${NavScreen.TvDetails.route}/$url")
+              MainScreenHomeTab.PERSON -> navController.navigate("${NavScreen.PersonDetails.route}/$url")
             }
           }
         )
@@ -78,42 +78,42 @@ fun MainScreen() {
       composable(
         route = NavScreen.MovieDetails.routeWithArgument,
         arguments = listOf(
-          navArgument(NavScreen.MovieDetails.argument0) { type = NavType.LongType }
+          navArgument(NavScreen.MovieDetails.argument0) { type = NavType.StringType }
         )
       ) { backStackEntry ->
 
-        val posterId =
-          backStackEntry.arguments?.getLong(NavScreen.MovieDetails.argument0) ?: return@composable
+        val url =
+          backStackEntry.arguments?.getString(NavScreen.MovieDetails.argument0) ?: return@composable
 
-        MovieDetailScreen(posterId, hiltViewModel()) {
+        MovieDetailScreen(url, hiltViewModel()) {
           navController.navigateUp()
         }
       }
       composable(
         route = NavScreen.TvDetails.routeWithArgument,
         arguments = listOf(
-          navArgument(NavScreen.TvDetails.argument0) { type = NavType.LongType }
+          navArgument(NavScreen.TvDetails.argument0) { type = NavType.StringType }
         )
       ) { backStackEntry ->
 
-        val posterId =
-          backStackEntry.arguments?.getLong(NavScreen.TvDetails.argument0) ?: return@composable
+        val url =
+          backStackEntry.arguments?.getString(NavScreen.TvDetails.argument0) ?: return@composable
 
-        TvDetailScreen(posterId, hiltViewModel()) {
+        TvDetailScreen(url, hiltViewModel()) {
           navController.navigateUp()
         }
       }
       composable(
         route = NavScreen.PersonDetails.routeWithArgument,
         arguments = listOf(
-          navArgument(NavScreen.PersonDetails.argument0) { type = NavType.LongType }
+          navArgument(NavScreen.PersonDetails.argument0) { type = NavType.StringType }
         )
       ) { backStackEntry ->
 
-        val personId =
-          backStackEntry.arguments?.getLong(NavScreen.PersonDetails.argument0) ?: return@composable
+        val url =
+          backStackEntry.arguments?.getString(NavScreen.PersonDetails.argument0) ?: return@composable
 
-        PersonDetailScreen(personId, hiltViewModel()) {
+        PersonDetailScreen(url, hiltViewModel()) {
           navController.navigateUp()
         }
       }

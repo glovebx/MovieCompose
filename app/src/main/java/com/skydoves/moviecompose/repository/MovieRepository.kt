@@ -20,6 +20,7 @@ import androidx.annotation.WorkerThread
 import com.skydoves.moviecompose.models.Keyword
 import com.skydoves.moviecompose.models.Review
 import com.skydoves.moviecompose.models.Video
+import com.skydoves.moviecompose.models.network.MovieResult
 import com.skydoves.moviecompose.network.service.MovieService
 import com.skydoves.moviecompose.persistence.MovieDao
 import com.skydoves.sandwich.suspendOnSuccess
@@ -38,59 +39,69 @@ class MovieRepository constructor(
   }
 
   @WorkerThread
-  fun loadKeywordList(id: Long) = flow<List<Keyword>> {
-    val movie = movieDao.getMovie(id)
-    var keywords = movie.keywords
-    if (keywords.isNullOrEmpty()) {
-      val response = movieService.fetchKeywords(id)
+  fun loadKeywordList(url: String) = flow<List<Keyword>> {
+//    val movie = movieDao.getMovie(id)
+//    var keywords = movie.keywords
+//    if (keywords.isNullOrEmpty()) {
+      val response = movieService.fetchKeywords(url)
       response.suspendOnSuccess {
-        keywords = data.keywords
-        movie.keywords = keywords
+        var keywords = data.keywords
+//        movie.keywords = keywords
+//        movieDao.updateMovie(movie)
         emit(keywords ?: listOf())
-        movieDao.updateMovie(movie)
       }
-    } else {
-      emit(keywords ?: listOf())
-    }
+//    } else {
+//      emit(keywords ?: listOf())
+//    }
   }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadVideoList(id: Long) = flow<List<Video>> {
-    val movie = movieDao.getMovie(id)
-    var videos = movie.videos
-    if (videos.isNullOrEmpty()) {
-      movieService.fetchVideos(id)
+  fun loadVideoList(url: String) = flow<List<Video>> {
+//    val movie = movieDao.getMovie(id)
+//    var videos = movie.videos
+//    if (videos.isNullOrEmpty()) {
+      movieService.fetchVideos(url)
         .suspendOnSuccess {
-          videos = data.results
-          movie.videos = videos
-          movieDao.updateMovie(movie)
+          var videos = data.results
+//          movie.videos = videos
+//          movieDao.updateMovie(movie)
           emit(videos ?: listOf())
         }
-    } else {
-      emit(videos ?: listOf())
-    }
+//    } else {
+//      emit(videos ?: listOf())
+//    }
   }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadReviewsList(id: Long) = flow<List<Review>> {
-    val movie = movieDao.getMovie(id)
-    var reviews = movie.reviews
-    if (reviews.isNullOrEmpty()) {
-      movieService.fetchReviews(id)
+  fun loadReviewsList(url: String) = flow<List<Review>> {
+//    val movie = movieDao.getMovie(id)
+//    var reviews = movie.reviews
+//    if (reviews.isNullOrEmpty()) {
+      movieService.fetchReviews(url)
         .suspendOnSuccess {
-          reviews = data.results
-          movie.reviews = reviews
-          movieDao.updateMovie(movie)
+          var reviews = data.results
+//          movie.reviews = reviews
+//          movieDao.updateMovie(movie)
           emit(reviews ?: listOf())
         }
-    } else {
-      emit(reviews ?: listOf())
-    }
+//    } else {
+//      emit(reviews ?: listOf())
+//    }
   }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadMovieById(id: Long) = flow {
-    val movie = movieDao.getMovie(id)
-    emit(movie)
+  fun loadMovieByUrl(url5: String) = flow {
+    val movie = movieDao.getMovie(url5)
+//    emit(movie)
+    val params = mapOf("url" to movie.url)
+    val response = movieService.fetchMovie(params)
+    response.suspendOnSuccess {
+      if (data.error != null) {
+        // 从error里面抽取出错误消息
+        emit(MovieResult(data.error!!.code, data.error!!.message))
+      } else {
+        emit(data.result!!)
+      }
+    }
   }.flowOn(Dispatchers.IO)
 }

@@ -18,7 +18,7 @@ package com.skydoves.moviecompose.network
 
 object Api {
 //  const val BASE_URL = "https://api.themoviedb.org/"
-  const val BASE_URL = "http://192.168.1.107:8069/"
+  const val BASE_URL = "http://192.168.1.103:8069/"
   private const val BASE_POSTER_PATH = "https://image.tmdb.org/t/p/w342"
   private const val BASE_BACKDROP_PATH = "https://image.tmdb.org/t/p/w780"
   private const val YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v="

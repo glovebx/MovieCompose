@@ -38,11 +38,11 @@ class TvRepository constructor(
   }
 
   @WorkerThread
-  fun loadKeywordList(id: Long) = flow<List<Keyword>> {
-    val tv = tvDao.getTv(id) ?: return@flow
+  fun loadKeywordList(id: String) = flow<List<Keyword>> {
+    val tv = tvDao.getTv(id.toLong()) ?: return@flow
     var keywords = tv.keywords
     if (keywords.isNullOrEmpty()) {
-      val response = tvService.fetchKeywords(id)
+      val response = tvService.fetchKeywords(id.toLong())
       response.suspendOnSuccess {
         keywords = data.keywords
         tv.keywords = keywords
@@ -55,11 +55,11 @@ class TvRepository constructor(
   }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadVideoList(id: Long) = flow<List<Video>> {
-    val tv = tvDao.getTv(id) ?: return@flow
+  fun loadVideoList(id: String) = flow<List<Video>> {
+    val tv = tvDao.getTv(id.toLong()) ?: return@flow
     var videos = tv.videos
     if (videos.isNullOrEmpty()) {
-      val response = tvService.fetchVideos(id)
+      val response = tvService.fetchVideos(id.toLong())
       response.suspendOnSuccess {
         videos = data.results
         tv.videos = videos
@@ -72,11 +72,11 @@ class TvRepository constructor(
   }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadReviewsList(id: Long) = flow<List<Review>> {
-    val tv = tvDao.getTv(id) ?: return@flow
+  fun loadReviewsList(id: String) = flow<List<Review>> {
+    val tv = tvDao.getTv(id.toLong()) ?: return@flow
     var reviews = tv.reviews
     if (reviews.isNullOrEmpty()) {
-      val response = tvService.fetchReviews(id)
+      val response = tvService.fetchReviews(id.toLong())
       response.suspendOnSuccess {
         reviews = data.results
         tv.reviews = reviews
@@ -89,8 +89,8 @@ class TvRepository constructor(
   }.flowOn(Dispatchers.IO)
 
   @WorkerThread
-  fun loadTvById(id: Long) = flow {
-    val tv = tvDao.getTv(id)
+  fun loadTvById(id: String) = flow {
+    val tv = tvDao.getTv(id.toLong())
     emit(tv)
   }.flowOn(Dispatchers.IO)
 }
