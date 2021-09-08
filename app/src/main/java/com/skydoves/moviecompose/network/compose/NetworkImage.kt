@@ -17,6 +17,7 @@
 package com.skydoves.moviecompose.network.compose
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.coil.CoilImage
@@ -59,6 +61,21 @@ fun NetworkImage(
       contentScale = contentScale,
       circularReveal = circularReveal,
       bitmapPalette = bitmapPalette,
+      loading = {
+        ConstraintLayout(
+          modifier = Modifier.fillMaxSize()
+        ) {
+          val indicator = createRef()
+          CircularProgressIndicator(
+            modifier = Modifier.constrainAs(indicator) {
+              top.linkTo(parent.top)
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            }
+          )
+        }
+      },
       failure = {
         Text(
           text = "image request failed.",

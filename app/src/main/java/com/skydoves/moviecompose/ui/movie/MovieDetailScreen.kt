@@ -16,8 +16,11 @@
 
 package com.skydoves.moviecompose.ui.movie
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.palette.graphics.Palette
 import com.google.accompanist.flowlayout.FlowRow
@@ -70,6 +74,7 @@ import com.skydoves.moviecompose.models.entities.Movie
 import com.skydoves.moviecompose.models.network.MovieResult
 import com.skydoves.moviecompose.network.Api
 import com.skydoves.moviecompose.network.compose.NetworkImage
+import com.skydoves.moviecompose.ui.components.WebView
 import com.skydoves.moviecompose.ui.custom.AppBarWithArrow
 import com.skydoves.moviecompose.ui.custom.RatingBar
 import com.skydoves.moviecompose.ui.theme.background
@@ -106,6 +111,13 @@ fun MovieDetailScreen(
     MovieDetailReviews(viewModel)
 
     Spacer(modifier = Modifier.height(24.dp))
+
+    movieResult?.data?.url?.run {
+      WebView(urlToRender = "https://www.baidu.com", modifier = Modifier
+        .fillMaxWidth()
+        .height(600.dp))
+    }
+
   }
 }
 
