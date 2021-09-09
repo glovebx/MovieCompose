@@ -35,6 +35,8 @@ ext.versions = [
     // startup
     startupVersion       : '1.1.0',
 
+    commonsLang3Version  : '3.12.0',
+
     // di
     hiltCoreVersion      : '2.37',
     hiltVersion          : '1.0.0',
