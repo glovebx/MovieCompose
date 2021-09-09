@@ -25,6 +25,7 @@ import com.skydoves.moviecompose.network.service.MovieService
 import com.skydoves.moviecompose.network.service.PeopleService
 import com.skydoves.moviecompose.network.service.TheDiscoverService
 import com.skydoves.moviecompose.network.service.TvService
+import com.skydoves.moviecompose.sandwich.JsonRpcConverterFactory
 import com.skydoves.sandwich.coroutines.CoroutinesResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -69,6 +70,7 @@ object NetworkModule {
     return Retrofit.Builder()
       .client(okhHttpClient)
       .baseUrl(Api.BASE_URL)
+      .addConverterFactory(JsonRpcConverterFactory.create())
       .addConverterFactory(GsonConverterFactory.create())
       .addCallAdapterFactory(CoroutinesResponseCallAdapterFactory.create())
       .build()

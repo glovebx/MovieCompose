@@ -94,13 +94,13 @@ fun MovieDetailScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        movieResult?.data?.url?.run {
+        movieResult?.data?.url?.apply {
 //      WebView(urlToRender = "https://www.baidu.com", modifier = Modifier
 //        .fillMaxWidth()
 //        .height(600.dp))
             CustomWebView(
                 modifier = Modifier.fillMaxSize(),
-                url = "https://www.baidu.com/",
+                url = this,
                 onProgressChange = { progress ->
                     rememberWebViewProgress = progress
                 },

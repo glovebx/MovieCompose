@@ -166,6 +166,8 @@ dependencies {
   // logging
   implementation "com.jakewharton.timber:timber:$versions.timberVersion"
 
+  implementation "org.apache.commons:commons-lang3:3.12.0"
+
   // unit test
   testImplementation "junit:junit:$versions.junitVersion"
   testImplementation "androidx.test:core:$versions.androidxTest"

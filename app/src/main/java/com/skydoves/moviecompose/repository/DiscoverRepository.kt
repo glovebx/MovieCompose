@@ -47,17 +47,18 @@ class DiscoverRepository constructor(
       val params = mapOf("page" to page.toString())
       val response = discoverService.fetchDiscoverMovie(params)
       response.suspendOnSuccess {
-        data.result?.run {
-          var movies = this.list
-//          movies.forEach { it.page = page }
-          movieDao.insertMovieList(movies)
-        }
-          if (data.error != null) {
-              // 从error里面抽取出错误消息
-              emit(DiscoverMovieResult(data.error!!.code, data.error!!.message))
-          } else {
-              emit(data.result!!)
-          }
+//        data.result?.run {
+//          var movies = this.list
+////          movies.forEach { it.page = page }
+//          movieDao.insertMovieList(movies)
+//        }
+//          if (data.error != null) {
+//              // 从error里面抽取出错误消息
+//              emit(DiscoverMovieResult(data.error!!.code, data.error!!.message))
+//          } else {
+//              emit(data.result!!)
+//          }
+        emit(data)
       }.onError {
         error()
       }.onException { error() }
