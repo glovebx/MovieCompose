@@ -16,6 +16,7 @@
 
 package com.skydoves.moviecompose.ui.main
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels

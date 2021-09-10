@@ -19,6 +19,7 @@ package com.skydoves.moviecompose.network.service
 import com.skydoves.moviecompose.models.network.DiscoverMovieResult
 import com.skydoves.moviecompose.models.network.DiscoverTvResponse
 import com.skydoves.moviecompose.sandwich.JsonRpcCall
+import com.skydoves.moviecompose.sandwich.JsonRpcRespond
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -37,8 +38,14 @@ interface TheDiscoverService {
    *  @return [DiscoverMovieResult] response
    */
   @POST("/odoostore/v1/app/search")
+  @JsonRpcRespond
+  @JvmSuppressWildcards
+  suspend fun fetchDiscoverMovie(@Body params: Map<String, Any>): ApiResponse<DiscoverMovieResult>
+
+  @POST("/web/session/authenticate")
   @JsonRpcCall
-  suspend fun fetchDiscoverMovie(@Body params: Map<String, String>): ApiResponse<DiscoverMovieResult>
+  @JvmSuppressWildcards
+  suspend fun authenticate(@Body params: Map<String, Any>): ApiResponse<DiscoverMovieResult>
 
   /**
    * [Tv Discover](https://developers.themoviedb.org/3/discover/tv-discover)

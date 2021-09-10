@@ -47,6 +47,10 @@ class DiscoverRepository constructor(
       val params = mapOf("page" to page.toString())
       val response = discoverService.fetchDiscoverMovie(params)
       response.suspendOnSuccess {
+        // 确保list不能是null
+        data?.list.run {
+          movieDao.insertMovieList(this)
+        }
 //        data.result?.run {
 //          var movies = this.list
 ////          movies.forEach { it.page = page }
@@ -65,6 +69,14 @@ class DiscoverRepository constructor(
 //    } else {
 //      emit(movies)
 //    }
+//
+//    val params = mapOf("db" to "odoo14e", "login" to "admin", "password" to "admin")
+//    val response = discoverService.authenticate(params)
+//    response.suspendOnSuccess {
+//      emit(data)
+//    }.onError {
+//      error()
+//    }.onException { error() }
   }.onCompletion { success() }.flowOn(Dispatchers.IO)
 
   @WorkerThread
