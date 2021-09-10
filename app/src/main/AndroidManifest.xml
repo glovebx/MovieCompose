@@ -3,7 +3,16 @@
   xmlns:tools="http://schemas.android.com/tools"
   package="com.skydoves.moviecompose">
 
-  <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS"
+        android:maxSdkVersion="22" />
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        android:maxSdkVersion="22" />
+    <uses-permission
+        android:name="android.permission.MANAGE_ACCOUNTS"
+        android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
   <application
     android:name=".MovieComposeApp"
@@ -37,6 +46,12 @@
         android:value="androidx.startup" />
     </provider>
 
+      <service android:name=".accounts.AuthenticatorService" android:exported="false">
+          <intent-filter>
+              <action android:name="android.accounts.AccountAuthenticator"/>
+          </intent-filter>
+          <meta-data android:name="android.accounts.AccountAuthenticator" android:resource="@xml/authenticator"/>
+      </service>
   </application>
 
 </manifest>
