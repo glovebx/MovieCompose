@@ -71,14 +71,14 @@ class JsonRpcConverterFactory private constructor()// Private constructor.
         return JsonRpcRequestBodyConverter<JsonRpcRequest>(method, delegate)
     }
 
-    internal class JsonRpcRequestBodyConverter<T>(
+    internal class JsonRpcRequestBodyConverter<F>(
         private val method: String,
         private val delegate: Converter<JsonRpcRequest, RequestBody>
     ) :
-        Converter<T, RequestBody> {
+        Converter<F, RequestBody> {
 
         @Throws(IOException::class)
-        override fun convert(value: T): RequestBody? {
+        override fun convert(value: F): RequestBody? {
             return delegate.convert(JsonRpcRequest.create(method, value))
         }
     }
