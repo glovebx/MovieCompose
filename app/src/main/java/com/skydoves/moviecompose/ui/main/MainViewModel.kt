@@ -19,6 +19,8 @@ package com.skydoves.moviecompose.ui.main
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
@@ -45,8 +47,17 @@ class MainViewModel @Inject constructor(
   private val peopleRepository: PeopleRepository
 ) : ViewModel() {
 
-  private val _selectedTab: MutableState<MainScreenHomeTab> =
-    mutableStateOf(MainScreenHomeTab.MOVIE)
+    private val _clickCount = mutableStateOf(0)
+    val clickCount: State<Int> get() = _clickCount
+
+    fun updateClick(value: Int) {
+        _clickCount.value = value
+    }
+
+    private val _currentScreen = mutableStateOf<Screens>(Screens.DrawerScreens.Home)
+    val currentScreen: State<Screens> get() = _currentScreen
+
+  private val _selectedTab: MutableState<MainScreenHomeTab> = mutableStateOf(MainScreenHomeTab.MOVIE)
   val selectedTab: State<MainScreenHomeTab> get() = _selectedTab
 
   private val _movieLoadingState: MutableState<NetworkState> = mutableStateOf(NetworkState.IDLE)
@@ -110,6 +121,10 @@ class MainViewModel @Inject constructor(
       }
     }
   }
+
+    fun setCurrentScreen(screen: Screens) {
+        _currentScreen.value = screen
+    }
 
   fun selectTab(tab: MainScreenHomeTab) {
     _selectedTab.value = tab

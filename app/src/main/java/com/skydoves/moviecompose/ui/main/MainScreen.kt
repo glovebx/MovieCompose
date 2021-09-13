@@ -26,8 +26,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,103 +52,117 @@ import com.skydoves.moviecompose.ui.navigation.NavScreen
 import com.skydoves.moviecompose.ui.people.PersonDetailScreen
 import com.skydoves.moviecompose.ui.theme.purple200
 import com.skydoves.moviecompose.ui.tv.TvDetailScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen() {
-  val navController = rememberNavController()
-  val tabStateHolder = HomeTabStateHolder(
-    rememberLazyListState(),
-    rememberLazyListState(),
-    rememberLazyListState(),
-  )
+    val navController = rememberNavController()
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    val tabStateHolder = HomeTabStateHolder(
+        rememberLazyListState(),
+        rememberLazyListState(),
+        rememberLazyListState(),
+    )
 
-  ProvideWindowInsets {
-    NavHost(navController = navController, startDestination = NavScreen.Home.route) {
-      composable(NavScreen.Home.route) {
-        HomeTabScreen(
-          viewModel = hiltViewModel(),
-          tabStateHolder = tabStateHolder,
-          selectItem = { tab, url ->
-            when (tab) {
-              MainScreenHomeTab.MOVIE -> navController.navigate("${NavScreen.MovieDetails.route}/$url")
-              MainScreenHomeTab.TV -> navController.navigate("${NavScreen.TvDetails.route}/$url")
-              MainScreenHomeTab.PERSON -> navController.navigate("${NavScreen.PersonDetails.route}/$url")
+    if (scaffoldState.drawerState.isOpen) {
+        BackPressHandler {
+            scope.launch {
+                scaffoldState.drawerState.close()
             }
-          }
-        )
-      }
-      composable(
-        route = NavScreen.MovieDetails.routeWithArgument,
-        arguments = listOf(
-          navArgument(NavScreen.MovieDetails.argument0) { type = NavType.StringType }
-        )
-      ) { backStackEntry ->
-
-        val url =
-          backStackEntry.arguments?.getString(NavScreen.MovieDetails.argument0) ?: return@composable
-
-        MovieDetailScreen(url, hiltViewModel()) {
-          navController.navigateUp()
         }
-      }
-      composable(
-        route = NavScreen.TvDetails.routeWithArgument,
-        arguments = listOf(
-          navArgument(NavScreen.TvDetails.argument0) { type = NavType.StringType }
-        )
-      ) { backStackEntry ->
-
-        val url =
-          backStackEntry.arguments?.getString(NavScreen.TvDetails.argument0) ?: return@composable
-
-        TvDetailScreen(url, hiltViewModel()) {
-          navController.navigateUp()
-        }
-      }
-      composable(
-        route = NavScreen.PersonDetails.routeWithArgument,
-        arguments = listOf(
-          navArgument(NavScreen.PersonDetails.argument0) { type = NavType.StringType }
-        )
-      ) { backStackEntry ->
-
-        val url =
-          backStackEntry.arguments?.getString(NavScreen.PersonDetails.argument0) ?: return@composable
-
-        PersonDetailScreen(url, hiltViewModel()) {
-          navController.navigateUp()
-        }
-      }
     }
-  }
+
+    ProvideWindowInsets {
+        NavHost(navController = navController, startDestination = NavScreen.Home.route) {
+            composable(NavScreen.Home.route) {
+                HomeTabScreen(
+                    viewModel = hiltViewModel(),
+                    tabStateHolder = tabStateHolder,
+                    selectItem = { tab, url ->
+                        when (tab) {
+                            MainScreenHomeTab.MOVIE -> navController.navigate("${NavScreen.MovieDetails.route}/$url")
+                            MainScreenHomeTab.TV -> navController.navigate("${NavScreen.TvDetails.route}/$url")
+                            MainScreenHomeTab.PERSON -> navController.navigate("${NavScreen.PersonDetails.route}/$url")
+                        }
+                    }
+                )
+            }
+            composable(
+                route = NavScreen.MovieDetails.routeWithArgument,
+                arguments = listOf(
+                    navArgument(NavScreen.MovieDetails.argument0) { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+
+                val url =
+                    backStackEntry.arguments?.getString(NavScreen.MovieDetails.argument0)
+                        ?: return@composable
+
+                MovieDetailScreen(url, hiltViewModel()) {
+                    navController.navigateUp()
+                }
+            }
+            composable(
+                route = NavScreen.TvDetails.routeWithArgument,
+                arguments = listOf(
+                    navArgument(NavScreen.TvDetails.argument0) { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+
+                val url =
+                    backStackEntry.arguments?.getString(NavScreen.TvDetails.argument0)
+                        ?: return@composable
+
+                TvDetailScreen(url, hiltViewModel()) {
+                    navController.navigateUp()
+                }
+            }
+            composable(
+                route = NavScreen.PersonDetails.routeWithArgument,
+                arguments = listOf(
+                    navArgument(NavScreen.PersonDetails.argument0) { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+
+                val url =
+                    backStackEntry.arguments?.getString(NavScreen.PersonDetails.argument0)
+                        ?: return@composable
+
+                PersonDetailScreen(url, hiltViewModel()) {
+                    navController.navigateUp()
+                }
+            }
+        }
+    }
 }
 
 @Preview
 @Composable
 fun MainAppBar() {
-  TopAppBar(
-    elevation = 6.dp,
-    backgroundColor = purple200,
-    modifier = Modifier.height(58.dp)
-  ) {
-    Text(
-      modifier = Modifier
-        .padding(8.dp)
-        .align(Alignment.CenterVertically),
-      text = stringResource(R.string.app_name),
-      color = Color.White,
-      fontSize = 18.sp,
-      fontWeight = FontWeight.Bold
-    )
-  }
+    TopAppBar(
+        elevation = 6.dp,
+        backgroundColor = purple200,
+        modifier = Modifier.height(58.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterVertically),
+            text = stringResource(R.string.app_name),
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
 }
 
 @Immutable
 enum class MainScreenHomeTab(
-  @StringRes val title: Int,
-  val icon: ImageVector
+    @StringRes val title: Int,
+    val icon: ImageVector
 ) {
-  MOVIE(R.string.menu_movie, Icons.Filled.Home),
-  TV(R.string.menu_tv, Icons.Filled.Tv),
-  PERSON(R.string.menu_person, Icons.Filled.Person);
+    MOVIE(R.string.menu_movie, Icons.Filled.Home),
+    TV(R.string.menu_tv, Icons.Filled.Tv),
+    PERSON(R.string.menu_person, Icons.Filled.Person);
 }
