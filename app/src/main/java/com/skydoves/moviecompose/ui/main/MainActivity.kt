@@ -40,6 +40,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.skydoves.landscapist.coil.LocalCoilImageLoader
+import com.skydoves.moviecompose.ui.login.AuthScreen
+import com.skydoves.moviecompose.ui.login.AuthViewModel
+import com.skydoves.moviecompose.ui.login.LoginScreen
+import com.skydoves.moviecompose.ui.login.RegistrationScreen
 import com.skydoves.moviecompose.ui.theme.MovieComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -67,6 +71,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun AppScaffold() {
     val viewModel: MainViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -141,12 +146,9 @@ fun AppScaffold() {
         },
         drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
     ) {
-        if (viewModel.clickCount.value == 0) NavHost(navController = navController, startDestination = "login_screen",
+        if (viewModel.clickCount.value == 0) NavHost(navController = navController, startDestination = "auth_screen",
             builder = {
-            composable("login_screen", content = { LoginScreen(navController = navController, viewModel = viewModel) })
-            composable(
-                "register_screen",
-                content = { RegistrationScreen(navController = navController) })
+                composable("auth_screen", content = { AuthScreen(navController = navController, viewModel = authViewModel) })
         }) else NavigationHost(navController = navController, viewModel = viewModel)
     }
 }

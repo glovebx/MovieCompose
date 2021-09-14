@@ -17,8 +17,27 @@
 package com.skydoves.moviecompose.network
 
 import com.skydoves.moviecompose.BuildConfig
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.Response
+
+internal class HostInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        if (request.url.toString().startsWith("http", ignoreCase = true)) {
+            return chain.proceed(request)
+        }
+        // 没有定义完整的url，替换odoo
+        return chain.proceed(
+            request.newBuilder()
+                .url(
+                    ("https://api.moco.co" + request.url.toString())
+                        .toHttpUrlOrNull() ?: request.url
+                )
+                .build()
+        )
+    }
+}
 
 internal class RequestInterceptor : Interceptor {
   override fun intercept(chain: Interceptor.Chain): Response {

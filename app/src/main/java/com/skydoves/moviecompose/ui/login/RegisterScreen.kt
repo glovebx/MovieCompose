@@ -1,4 +1,4 @@
-package com.skydoves.moviecompose.ui.main
+package com.skydoves.moviecompose.ui.login
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun RegistrationScreen(navController: NavController) {
+fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel) {
     val context = LocalContext.current
     val name = remember {
         mutableStateOf(TextFieldValue())

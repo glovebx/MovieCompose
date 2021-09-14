@@ -20,6 +20,7 @@ import android.content.Context
 import coil.ImageLoader
 import com.skydoves.moviecompose.BuildConfig
 import com.skydoves.moviecompose.network.Api
+import com.skydoves.moviecompose.network.HostInterceptor
 import com.skydoves.moviecompose.network.RequestInterceptor
 import com.skydoves.moviecompose.network.service.MovieService
 import com.skydoves.moviecompose.network.service.PeopleService
@@ -46,6 +47,7 @@ object NetworkModule {
   @Singleton
   fun provideOkHttpClient(): OkHttpClient {
     return OkHttpClient.Builder()
+        .addInterceptor(HostInterceptor())
       .addInterceptor(RequestInterceptor())
       .addInterceptor(HttpLoggingInterceptor().setLevel(
         if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY

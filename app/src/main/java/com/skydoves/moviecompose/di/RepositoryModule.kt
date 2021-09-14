@@ -16,17 +16,11 @@
 
 package com.skydoves.moviecompose.di
 
-import com.skydoves.moviecompose.network.service.MovieService
-import com.skydoves.moviecompose.network.service.PeopleService
-import com.skydoves.moviecompose.network.service.TheDiscoverService
-import com.skydoves.moviecompose.network.service.TvService
+import com.skydoves.moviecompose.network.service.*
 import com.skydoves.moviecompose.persistence.MovieDao
 import com.skydoves.moviecompose.persistence.PeopleDao
 import com.skydoves.moviecompose.persistence.TvDao
-import com.skydoves.moviecompose.repository.DiscoverRepository
-import com.skydoves.moviecompose.repository.MovieRepository
-import com.skydoves.moviecompose.repository.PeopleRepository
-import com.skydoves.moviecompose.repository.TvRepository
+import com.skydoves.moviecompose.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,6 +30,14 @@ import dagger.hilt.android.scopes.ViewModelScoped
 @Module
 @InstallIn(ViewModelComponent::class)
 object RepositoryModule {
+
+    @Provides
+    @ViewModelScoped
+    fun provideAuthRepository(
+        authService: AuthService
+    ): AuthRepository {
+        return AuthRepository(authService)
+    }
 
   @Provides
   @ViewModelScoped

@@ -1,4 +1,4 @@
-package com.skydoves.moviecompose.ui.main
+package com.skydoves.moviecompose.ui.login
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -18,13 +18,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: MainViewModel) {
+fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     val context = LocalContext.current
     val email = remember { mutableStateOf(TextFieldValue()) }
     val emailErrorState = remember { mutableStateOf(false) }
@@ -118,7 +117,6 @@ fun LoginScreen(navController: NavController, viewModel: MainViewModel) {
                             "Logged in successfully",
                             Toast.LENGTH_SHORT
                         ).show()
-                        viewModel.updateClick(1)
                         navController.popBackStack()
                     }
                 }
