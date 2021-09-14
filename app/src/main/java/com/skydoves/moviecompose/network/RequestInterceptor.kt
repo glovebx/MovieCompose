@@ -17,21 +17,24 @@
 package com.skydoves.moviecompose.network
 
 import com.skydoves.moviecompose.BuildConfig
+import com.skydoves.moviecompose.accounts.OdooManager
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.Response
 
+internal const val FAKE_BASE_URL = Api.BASE_URL
+
 internal class HostInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        if (request.url.toString().startsWith("http", ignoreCase = true)) {
+        if (OdooManager.serverUrl.isNullOrEmpty() || !request.url.toString().startsWith(FAKE_BASE_URL, ignoreCase = true)) {
             return chain.proceed(request)
         }
         // 没有定义完整的url，替换odoo
         return chain.proceed(
             request.newBuilder()
                 .url(
-                    ("https://api.moco.co" + request.url.toString())
+                    request.url.toString().replace(FAKE_BASE_URL, OdooManager.serverUrl!!)
                         .toHttpUrlOrNull() ?: request.url
                 )
                 .build()

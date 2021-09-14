@@ -22,10 +22,7 @@ import com.skydoves.moviecompose.BuildConfig
 import com.skydoves.moviecompose.network.Api
 import com.skydoves.moviecompose.network.HostInterceptor
 import com.skydoves.moviecompose.network.RequestInterceptor
-import com.skydoves.moviecompose.network.service.MovieService
-import com.skydoves.moviecompose.network.service.PeopleService
-import com.skydoves.moviecompose.network.service.TheDiscoverService
-import com.skydoves.moviecompose.network.service.TvService
+import com.skydoves.moviecompose.network.service.*
 import com.skydoves.moviecompose.sandwich.JsonRpcConverterFactory
 import com.skydoves.sandwich.coroutines.CoroutinesResponseCallAdapterFactory
 import dagger.Module
@@ -77,6 +74,12 @@ object NetworkModule {
       .addCallAdapterFactory(CoroutinesResponseCallAdapterFactory.create())
       .build()
   }
+
+    @Provides
+    @Singleton
+    fun provideAuthService(retrofit: Retrofit): AuthService {
+        return retrofit.create(AuthService::class.java)
+    }
 
   @Provides
   @Singleton

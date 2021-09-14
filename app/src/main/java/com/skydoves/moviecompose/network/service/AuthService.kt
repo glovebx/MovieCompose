@@ -16,21 +16,27 @@
 
 package com.skydoves.moviecompose.network.service
 
-import com.skydoves.moviecompose.models.network.DatabaseListResult
-import com.skydoves.moviecompose.models.network.VersionResult
+import com.skydoves.moviecompose.models.entities.Database
+import com.skydoves.moviecompose.models.entities.Version
 import com.skydoves.moviecompose.sandwich.JsonRpcCall
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 
 interface AuthService {
-    @GET("/web/webclient/version_info")
+    @POST("/web/webclient/version_info")
     @JsonRpcCall
     @JvmSuppressWildcards
-    suspend fun fetchVersionInfo(@Body params: Map<String, Any>): ApiResponse<VersionResult>
+    suspend fun fetchVersionInfo(@Body params: Map<String, Any>): ApiResponse<Version>
 
-    @GET("/web/database/list")
+    @POST("/web/database/list")
     @JsonRpcCall
     @JvmSuppressWildcards
-    suspend fun fetchDatabaseList(@Body params: Map<String, Any>): ApiResponse<DatabaseListResult>
+    suspend fun fetchDatabaseList(@Body params: Map<String, Any>): ApiResponse<List<Database>>
+
+    @POST("/web/session/authenticate")
+    @JsonRpcCall
+    @JvmSuppressWildcards
+    suspend fun authenticate(@Body params: Map<String, Any>): ApiResponse<String>
 }

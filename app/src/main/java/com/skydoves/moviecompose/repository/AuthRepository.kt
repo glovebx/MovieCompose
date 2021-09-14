@@ -17,15 +17,13 @@
 package com.skydoves.moviecompose.repository
 
 import androidx.annotation.WorkerThread
+import com.skydoves.moviecompose.accounts.OdooManager
+import com.skydoves.moviecompose.models.entities.Database
 import com.skydoves.moviecompose.network.service.AuthService
 import com.skydoves.moviecompose.persistence.MovieDao
-import com.skydoves.sandwich.suspendOnSuccess
-import com.skydoves.sandwich.toSuspendFlow
+import com.skydoves.sandwich.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flatMap
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 class AuthRepository constructor(
@@ -37,20 +35,34 @@ class AuthRepository constructor(
   }
 
   @WorkerThread
-  fun loadVersionInfo(url: String) = flow {
+  fun loadVersionAndDatabaseInfo(url: String, success: () -> Unit, error: () -> Unit) = flow {
+      OdooManager.serverUrl = url
     val params = mapOf<String, Any>()
-    val response = authService.fetchVersionInfo(params)
-    response.suspendOnSuccess {
-        emit(data)
-    }
-  }
-//      .flatMapLatest { flow {
-//          val params = mapOf<String, Any>()
-//          val response = authService.fetchDatabaseList(params)
-//          response.suspendOnSuccess {
-//              emit(data)
-//          }
-//      }
-//  }
-      .flowOn(Dispatchers.IO)
+    val version = authService.fetchVersionInfo(params).getOrNull()
+      if (version == null) {
+          error()
+      } else {
+          // TODO: 判断是不是企业版
+          val databaseList = authService.fetchDatabaseList(params).getOrElse(listOf())
+          emit(databaseList)
+      }
+  }.onCompletion { success() }.flowOn(Dispatchers.IO)
+
+    @WorkerThread
+    fun setupDatabaseName(db: String) = flow {
+        OdooManager.db = db
+        emit(db)
+    }.flowOn(Dispatchers.IO)
+
+    @WorkerThread
+    fun authenticate(db: String, login: String, password: String, success: () -> Unit, error: () -> Unit) = flow {
+        val params = mapOf<String, Any>("db" to db, "login" to login, "password" to password)
+        val response = authService.authenticate(params)
+        response.suspendOnSuccess {
+        // TODO: 保存到数据库
+         emit(data)
+        }.onError {
+            error()
+        }.onException { error() }
+    }.onCompletion { success() }.flowOn(Dispatchers.IO)
 }

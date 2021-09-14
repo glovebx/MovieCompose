@@ -6,9 +6,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,10 +20,18 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.skydoves.moviecompose.accounts.OdooManager
+import com.skydoves.moviecompose.models.entities.Database
+import com.skydoves.moviecompose.models.network.NetworkState
+import com.skydoves.moviecompose.models.network.onLoading
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
+fun LoginScreen(viewModel: AuthViewModel) {
     val context = LocalContext.current
+
+    val networkState: NetworkState by viewModel.authLoadingState
+    val result: String? by viewModel.authenticateFlow.collectAsState(initial = null)
+
     val email = remember { mutableStateOf(TextFieldValue()) }
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordErrorState = remember { mutableStateOf(false) }
@@ -112,12 +119,15 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     else -> {
                         passwordErrorState.value = false
                         emailErrorState.value = false
-                        Toast.makeText(
-                            context,
-                            "Logged in successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        navController.popBackStack()
+//                        Toast.makeText(
+//                            context,
+//                            "Logged in successfully",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        navController.popBackStack()
+//                        viewModel.switchParticle(Particle.DATABASE_SELECT)
+//                        viewModel.fetchServerVersionInfo()
+                        viewModel.authenticate(OdooManager.db!!, email.value.text, password.value.text)
                     }
                 }
 
@@ -131,13 +141,26 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         Spacer(Modifier.size(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             TextButton(onClick = {
-                navController.navigate("register_screen") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
+//                navController.navigate("register_screen") {
+//                    popUpTo(navController.graph.startDestinationId)
+//                    launchSingleTop = true
+//                }
+                viewModel.switchParticle(Particle.DATABASE_INPUT)
             }) {
-                Text(text = "Register ?", color = Color.Red)
+                Text(text = "< Back", color = Color.Red)
             }
+        }
+    }
+
+
+    networkState.onLoading {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }
