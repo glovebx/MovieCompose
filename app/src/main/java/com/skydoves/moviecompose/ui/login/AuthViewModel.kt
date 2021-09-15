@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.models.OdooLogin
+import com.skydoves.moviecompose.models.network.JsonRpcCallState
 import com.skydoves.moviecompose.models.network.NetworkState
 import com.skydoves.moviecompose.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,6 +57,9 @@ class AuthViewModel @Inject constructor(
     private val _authLoadingState: MutableState<NetworkState> = mutableStateOf(NetworkState.IDLE)
     val authLoadingState: State<NetworkState> get() = _authLoadingState
 
+    private val _jsonRpcCallState: MutableState<JsonRpcCallState> = mutableStateOf(JsonRpcCallState.IDLE)
+    val jsonRpcCallState: State<JsonRpcCallState> get() = _jsonRpcCallState
+
     private val _versionAndDatabaseFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
     val versionAndDatabaseFlow = _versionAndDatabaseFlow.flatMapLatest {
         if (it.isNullOrEmpty()) {
@@ -64,9 +68,11 @@ class AuthViewModel @Inject constructor(
             }
         } else {
             _authLoadingState.value = NetworkState.LOADING
+            _jsonRpcCallState.value = JsonRpcCallState.LOADING
             authRepository.loadVersionAndDatabaseInfo(url = it,
                 success = { _authLoadingState.value = NetworkState.SUCCESS },
-                error = { _authLoadingState.value = NetworkState.ERROR }
+//                error = { _ -> _authLoadingState.value = NetworkState.ERROR }
+                error = { code, message -> _jsonRpcCallState.value = JsonRpcCallState.ERROR(code, message) }
             )
         }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)

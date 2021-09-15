@@ -18,6 +18,7 @@ package com.skydoves.moviecompose.repository
 
 import androidx.annotation.WorkerThread
 import com.skydoves.moviecompose.accounts.OdooManager
+import com.skydoves.moviecompose.exceptions.ApiException
 import com.skydoves.moviecompose.models.OdooLogin
 import com.skydoves.moviecompose.network.service.AuthService
 import com.skydoves.moviecompose.persistence.AuthDao
@@ -37,12 +38,12 @@ class AuthRepository constructor(
     }
 
     @WorkerThread
-    fun loadVersionAndDatabaseInfo(url: String, success: () -> Unit, error: () -> Unit) = flow {
+    fun loadVersionAndDatabaseInfo(url: String, success: () -> Unit, error: (Int, String) -> Unit) = flow {
         OdooManager.serverUrl = url
         val params = mapOf<String, Any>()
         val version = authService.fetchVersionInfo(params).getOrNull()
         if (version == null) {
-            error()
+            error(1, "")
         } else {
             // TODO: 判断是不是企业版
             val databaseList = authService.fetchDatabaseList(params).getOrElse(listOf())
@@ -125,6 +126,8 @@ class AuthRepository constructor(
                 emit(AuthenticateResult.AUTHENTICATED)
             }.suspendOnError {
                 emit(AuthenticateResult.SESSION_EXPIRED)
+            }.suspendOnException {
+                emit(AuthenticateResult.AUTHENTICATE_FAILED)
             }
         } else {
             emit(AuthenticateResult.ACCOUNT_NOT_EXISTS)

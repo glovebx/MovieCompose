@@ -19,7 +19,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.models.entities.Database
+import com.skydoves.moviecompose.models.network.JsonRpcCallState
 import com.skydoves.moviecompose.models.network.NetworkState
+import com.skydoves.moviecompose.models.network.onError
 import com.skydoves.moviecompose.models.network.onLoading
 import com.skydoves.moviecompose.ui.theme.MovieComposeTheme
 import kotlinx.coroutines.launch
@@ -54,20 +56,20 @@ fun AuthScreen(navController: NavController, viewModel: AuthViewModel) {
 
 @Composable
 fun AutoAuthenticateScreen(viewModel: AuthViewModel) {
-    val coroutineScope = rememberCoroutineScope()
-
     val networkState: NetworkState by viewModel.authLoadingState
     val authenticateResult: AuthenticateResult? by viewModel.authenticateCurrentFlow.collectAsState(initial = null)
 
     LaunchedEffect(key1 = "") {
-        coroutineScope.launch {
-            viewModel.startCurrentAuthenticate()
-        }
+        viewModel.startCurrentAuthenticate()
     }
 
     when(authenticateResult) {
         AuthenticateResult.SESSION_EXPIRED -> {
             // session过期，直接到登录界面
+            viewModel.switchParticle(Particle.SIGN_IN)
+        }
+        AuthenticateResult.AUTHENTICATE_FAILED -> {
+            // 账号有效，直接进入业务界面
             viewModel.switchParticle(Particle.SIGN_IN)
         }
         AuthenticateResult.SWITCH_ACCOUNT -> {
@@ -117,6 +119,8 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
 //    val context = LocalContext.current
     val networkState: NetworkState by viewModel.authLoadingState
     val databaseList: List<Database>? by viewModel.versionAndDatabaseFlow.collectAsState(initial = null)
+
+    val jsonRpcCallState: JsonRpcCallState by viewModel.jsonRpcCallState
 
     if (databaseList != null) {
         when (databaseList?.size) {
@@ -222,6 +226,14 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
 //    networkState.onError {
 //        serverUrlErrorState.value = true
 //    }
+
+    jsonRpcCallState.onError {
+        code, message -> if (code == 1) {
+
+    } else {
+
+    }
+    }
 
     networkState.onLoading {
         Box(
