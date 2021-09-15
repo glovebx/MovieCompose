@@ -95,7 +95,7 @@ class AuthViewModel @Inject constructor(
             }
         } else {
             _authLoadingState.value = NetworkState.LOADING
-            authRepository.authenticate(db = it.db, login = it.login, password = it.password,
+            authRepository.authenticate(odooLogin = it,
                 success = { _authLoadingState.value = NetworkState.SUCCESS },
                 error = { _authLoadingState.value = NetworkState.ERROR }
             )
@@ -108,7 +108,7 @@ class AuthViewModel @Inject constructor(
     val authenticateCurrentFlow = _authenticateCurrentFlow.flatMapLatest {
         if (it == 0) {
             flow {
-                emit(AuthenticateResult.SWITCH_ACCOUNT)
+                emit(null)
             }
         } else {
             _authLoadingState.value = NetworkState.LOADING
@@ -118,9 +118,10 @@ class AuthViewModel @Inject constructor(
         }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
     fun startCurrentAuthenticate(active: Int = 1) = _authenticateCurrentFlow.tryEmit(active)
-    fun clearCurrentAuthenticate() {
+
+    fun clearAuthenticate() {
+        _authenticateFlow.tryEmit(OdooLogin())
         _authenticateCurrentFlow.tryEmit(0)
-        _authenticateFlow.tryEmit(OdooLogin("", "", "", ""))
     }
 
 }

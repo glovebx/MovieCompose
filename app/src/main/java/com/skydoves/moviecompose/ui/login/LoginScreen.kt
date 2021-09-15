@@ -74,6 +74,9 @@ fun LoginScreen(viewModel: AuthViewModel) {
         OutlinedTextField(
             value = email.value,
             onValueChange = {
+                if (loginErrorState.value) {
+                    loginErrorState.value = false
+                }
                 if (emailErrorState.value) {
                     emailErrorState.value = false
                 }
@@ -93,6 +96,9 @@ fun LoginScreen(viewModel: AuthViewModel) {
         OutlinedTextField(
             value = password.value,
             onValueChange = {
+                if (loginErrorState.value) {
+                    loginErrorState.value = false
+                }
                 if (passwordErrorState.value) {
                     passwordErrorState.value = false
                 }
@@ -163,8 +169,8 @@ fun LoginScreen(viewModel: AuthViewModel) {
 //                    popUpTo(navController.graph.startDestinationId)
 //                    launchSingleTop = true
 //                }
+                viewModel.clearAuthenticate()
                 viewModel.clearDatabaseName()
-                viewModel.clearServerBasicInfo()
                 viewModel.switchParticle(Particle.DATABASE_INPUT)
             }) {
                 Text(text = "< Back", color = Color.Red)

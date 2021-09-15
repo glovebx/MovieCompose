@@ -24,4 +24,8 @@ data class OdooLogin(
   val db: String,
   val login: String,
   val password: String,
-)
+) {
+    constructor() : this("", "", "", "") {
+
+    }
+}

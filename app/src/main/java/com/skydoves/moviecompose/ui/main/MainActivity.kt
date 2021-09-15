@@ -170,9 +170,9 @@ fun NavigationHost(navController: NavController, viewModel: MainViewModel, authV
         composable(Screens.HomeScreens.Notification.route) { Notification(viewModel = viewModel) }
         composable(Screens.HomeScreens.MyNetwork.route) { MyNetwork(viewModel = viewModel) }
         composable(Screens.DrawerScreens.Account.route) {
-            authViewModel.clearCurrentAuthenticate()
-            authViewModel.switchParticle(Particle.SIGN_IN)
+            authViewModel.clearAuthenticate()
             authViewModel.onOdooAuthenticated(false)
+            authViewModel.switchParticle(Particle.SIGN_IN)
 //            Account(viewModel = viewModel)
         }
         composable(Screens.DrawerScreens.Help.route) { Help(viewModel = viewModel) }

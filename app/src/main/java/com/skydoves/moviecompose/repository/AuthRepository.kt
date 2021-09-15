@@ -18,6 +18,7 @@ package com.skydoves.moviecompose.repository
 
 import androidx.annotation.WorkerThread
 import com.skydoves.moviecompose.accounts.OdooManager
+import com.skydoves.moviecompose.models.OdooLogin
 import com.skydoves.moviecompose.network.service.AuthService
 import com.skydoves.moviecompose.persistence.AuthDao
 import com.skydoves.moviecompose.ui.login.AuthenticateResult
@@ -57,13 +58,12 @@ class AuthRepository constructor(
 
     @WorkerThread
     fun authenticate(
-        db: String,
-        login: String,
-        password: String,
+        odooLogin: OdooLogin,
         success: () -> Unit,
         error: () -> Unit
     ) = flow {
-        val params = mapOf<String, Any>("db" to db, "login" to login, "password" to password)
+        val params = mapOf<String, Any>("db" to odooLogin.db,
+            "login" to odooLogin.login, "password" to odooLogin.password)
         val response = authService.authenticate(params)
         response.suspendOnSuccess {
             OdooManager.sessionId = headers["Set-Cookie"]?.split(";").let {
