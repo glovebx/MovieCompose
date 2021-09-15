@@ -20,13 +20,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.skydoves.moviecompose.models.entities.Movie
+import com.skydoves.moviecompose.models.entities.OdooAuthenticate
 import com.skydoves.moviecompose.models.entities.Person
 import com.skydoves.moviecompose.models.entities.Tv
 import com.skydoves.moviecompose.persistence.converters.*
 
 @Database(
-  entities = [(Movie::class), (Tv::class), (Person::class)],
-  version = 3, exportSchema = false
+  entities = [(Movie::class), (Tv::class), (Person::class), (OdooAuthenticate::class)],
+  version = 1, exportSchema = false
 )
 @TypeConverters(
   value = [
@@ -38,4 +39,6 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun movieDao(): MovieDao
   abstract fun tvDao(): TvDao
   abstract fun peopleDao(): PeopleDao
+
+  abstract fun authDao(): AuthDao
 }

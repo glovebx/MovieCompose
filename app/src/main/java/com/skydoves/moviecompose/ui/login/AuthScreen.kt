@@ -20,10 +20,9 @@ import androidx.navigation.NavController
 import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.models.entities.Database
 import com.skydoves.moviecompose.models.network.NetworkState
-import com.skydoves.moviecompose.models.network.onError
 import com.skydoves.moviecompose.models.network.onLoading
-import com.skydoves.moviecompose.models.network.onSuccess
 import com.skydoves.moviecompose.ui.theme.MovieComposeTheme
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -33,6 +32,9 @@ fun AuthScreen(navController: NavController, viewModel: AuthViewModel) {
     MovieComposeTheme() {
         Crossfade(targetState = particle) {
             when (it) {
+                Particle.AUTO_AUTHENTICATE -> {
+                    AutoAuthenticateScreen(viewModel = viewModel)
+                }
                 Particle.SERVER_URL_INPUT -> {
                     ServerUrlScreen(viewModel = viewModel)
                 }
@@ -46,6 +48,66 @@ fun AuthScreen(navController: NavController, viewModel: AuthViewModel) {
                     LoginScreen(viewModel = viewModel)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AutoAuthenticateScreen(viewModel: AuthViewModel) {
+    val coroutineScope = rememberCoroutineScope()
+
+    val networkState: NetworkState by viewModel.authLoadingState
+    val authenticateResult: AuthenticateResult? by viewModel.authenticateCurrentFlow.collectAsState(initial = null)
+
+    LaunchedEffect(key1 = "") {
+        coroutineScope.launch {
+            viewModel.startCurrentAuthenticate()
+        }
+    }
+
+    when(authenticateResult) {
+        AuthenticateResult.SESSION_EXPIRED -> {
+            // session过期，直接到登录界面
+            viewModel.switchParticle(Particle.SIGN_IN)
+        }
+        AuthenticateResult.SWITCH_ACCOUNT -> {
+            // 切换账号，到登录界面
+            viewModel.switchParticle(Particle.SIGN_IN)
+        }
+        AuthenticateResult.ACCOUNT_NOT_EXISTS -> {
+            // 没有账号，到serverUrl输入界面
+            viewModel.switchParticle(Particle.SERVER_URL_INPUT)
+        }
+        AuthenticateResult.AUTHENTICATED -> {
+            // 账号有效，直接进入业务界面
+            viewModel.onOdooAuthenticated(true)
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(text = buildAnnotatedString {
+            withStyle(style = SpanStyle(color = Color.Red)) {
+                append("A")
+            }
+            withStyle(style = SpanStyle(color = Color.Black)) {
+                append("uthenticating")
+            }
+        }, fontSize = 30.sp)
+    }
+
+    networkState.onLoading {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }
@@ -80,6 +142,7 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
 
     val serverUrl = remember { mutableStateOf(TextFieldValue()) }
     val serverUrlErrorState = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -155,10 +218,10 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
         )
     }
-
-    networkState.onError {
-        serverUrlErrorState.value = true
-    }
+//
+//    networkState.onError {
+//        serverUrlErrorState.value = true
+//    }
 
     networkState.onLoading {
         Box(

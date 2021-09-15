@@ -17,6 +17,7 @@
 package com.skydoves.moviecompose.di
 
 import com.skydoves.moviecompose.network.service.*
+import com.skydoves.moviecompose.persistence.AuthDao
 import com.skydoves.moviecompose.persistence.MovieDao
 import com.skydoves.moviecompose.persistence.PeopleDao
 import com.skydoves.moviecompose.persistence.TvDao
@@ -34,9 +35,10 @@ object RepositoryModule {
     @Provides
     @ViewModelScoped
     fun provideAuthRepository(
-        authService: AuthService
+        authService: AuthService,
+        authDao: AuthDao
     ): AuthRepository {
-        return AuthRepository(authService)
+        return AuthRepository(authService, authDao)
     }
 
   @Provides

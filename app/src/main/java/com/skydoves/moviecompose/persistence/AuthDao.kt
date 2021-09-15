@@ -16,24 +16,23 @@
 
 package com.skydoves.moviecompose.persistence
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
-import com.skydoves.moviecompose.models.entities.Movie
+import androidx.room.*
+import com.skydoves.moviecompose.models.entities.OdooAuthenticate
 
 @Dao
 interface AuthDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun insertMovieList(movies: List<Movie>)
+  suspend fun insertOdooAuthenticate(odooAuthenticate: OdooAuthenticate)
 
   @Update
-  suspend fun updateMovie(movie: Movie)
+  suspend fun updateOdooAuthenticate(odooAuthenticate: OdooAuthenticate)
 
-  @Query("SELECT * FROM MOVIE WHERE url5 = :url5_")
-  suspend fun getMovie(url5_: String): Movie
+  @Query("SELECT * FROM OdooAuthenticate WHERE active == 1")
+  suspend fun getCurrentOdooAuthenticate(): OdooAuthenticate
 
-//  @Query("SELECT * FROM Movie WHERE page = :page_")
-//  suspend fun getMovieList(page_: Int): List<Movie>
+  @Query("SELECT * FROM OdooAuthenticate ORDER BY active DESC")
+  suspend fun getOdooAuthenticateList(): List<OdooAuthenticate>
+
+  @Query("SELECT * FROM OdooAuthenticate WHERE serverUrl = :serverUrl_")
+  suspend fun getOdooDatabaseList(serverUrl_: String): List<OdooAuthenticate>
 }

@@ -18,10 +18,7 @@ package com.skydoves.moviecompose.di
 
 import android.content.Context
 import androidx.room.Room
-import com.skydoves.moviecompose.persistence.AppDatabase
-import com.skydoves.moviecompose.persistence.MovieDao
-import com.skydoves.moviecompose.persistence.PeopleDao
-import com.skydoves.moviecompose.persistence.TvDao
+import com.skydoves.moviecompose.persistence.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,6 +37,12 @@ object PersistenceModule {
       .databaseBuilder(context, AppDatabase::class.java, "MovieCompose.db")
       .allowMainThreadQueries()
       .build()
+  }
+
+  @Provides
+  @Singleton
+  fun provideAuthDao(appDatabase: AppDatabase): AuthDao {
+    return appDatabase.authDao()
   }
 
   @Provides

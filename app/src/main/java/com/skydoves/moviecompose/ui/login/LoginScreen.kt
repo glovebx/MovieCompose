@@ -1,6 +1,5 @@
 package com.skydoves.moviecompose.ui.login
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -19,23 +18,37 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.skydoves.moviecompose.accounts.OdooManager
-import com.skydoves.moviecompose.models.entities.Database
+import com.skydoves.moviecompose.models.OdooLogin
+import com.skydoves.moviecompose.models.entities.OdooAuthenticate
 import com.skydoves.moviecompose.models.network.NetworkState
+import com.skydoves.moviecompose.models.network.onError
 import com.skydoves.moviecompose.models.network.onLoading
 
 @Composable
 fun LoginScreen(viewModel: AuthViewModel) {
-    val context = LocalContext.current
-
+//    val context = LocalContext.current
     val networkState: NetworkState by viewModel.authLoadingState
-    val result: String? by viewModel.authenticateFlow.collectAsState(initial = null)
+    val authenticateResult: AuthenticateResult? by viewModel.authenticateFlow.collectAsState(initial = null)
 
     val email = remember { mutableStateOf(TextFieldValue()) }
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordErrorState = remember { mutableStateOf(false) }
     val password = remember { mutableStateOf(TextFieldValue()) }
+
+    val loginErrorState = remember { mutableStateOf(false) }
+
+    when(authenticateResult) {
+        AuthenticateResult.AUTHENTICATE_FAILED -> {
+            // 登录错误
+            loginErrorState.value = true
+        }
+        AuthenticateResult.AUTHENTICATED -> {
+            // 账号有效，直接进入业务界面
+            viewModel.onOdooAuthenticated(true)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -106,6 +119,9 @@ fun LoginScreen(viewModel: AuthViewModel) {
         if (passwordErrorState.value) {
             Text(text = "Required", color = Color.Red)
         }
+        if (loginErrorState.value) {
+            Text(text = "Login Failed", color = Color.Red)
+        }
         Spacer(Modifier.size(16.dp))
         Button(
             onClick = {
@@ -119,6 +135,7 @@ fun LoginScreen(viewModel: AuthViewModel) {
                     else -> {
                         passwordErrorState.value = false
                         emailErrorState.value = false
+                        loginErrorState.value = false
 //                        Toast.makeText(
 //                            context,
 //                            "Logged in successfully",
@@ -127,7 +144,8 @@ fun LoginScreen(viewModel: AuthViewModel) {
 //                        navController.popBackStack()
 //                        viewModel.switchParticle(Particle.DATABASE_SELECT)
 //                        viewModel.fetchServerVersionInfo()
-                        viewModel.authenticate(OdooManager.db!!, email.value.text, password.value.text)
+                        viewModel.authenticate(OdooLogin(OdooManager.serverUrl!!,
+                            OdooManager.db!!, email.value.text, password.value.text))
                     }
                 }
 
@@ -145,6 +163,8 @@ fun LoginScreen(viewModel: AuthViewModel) {
 //                    popUpTo(navController.graph.startDestinationId)
 //                    launchSingleTop = true
 //                }
+                viewModel.clearDatabaseName()
+                viewModel.clearServerBasicInfo()
                 viewModel.switchParticle(Particle.DATABASE_INPUT)
             }) {
                 Text(text = "< Back", color = Color.Red)

@@ -40,10 +40,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.skydoves.landscapist.coil.LocalCoilImageLoader
-import com.skydoves.moviecompose.ui.login.AuthScreen
-import com.skydoves.moviecompose.ui.login.AuthViewModel
-import com.skydoves.moviecompose.ui.login.LoginScreen
-import com.skydoves.moviecompose.ui.login.RegistrationScreen
+import com.skydoves.moviecompose.ui.login.*
 import com.skydoves.moviecompose.ui.theme.MovieComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -86,7 +83,7 @@ fun AppScaffold() {
     }
 
     var topBar: @Composable () -> Unit = {}
-    if (viewModel.clickCount.value == 1) {
+    if (authViewModel.odooAuthenticated.value) {
         topBar = {
             TopBar(
                 title = currentScreen!!.value.title,
@@ -146,15 +143,22 @@ fun AppScaffold() {
         },
         drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
     ) {
-        if (viewModel.clickCount.value == 0) NavHost(navController = navController, startDestination = "auth_screen",
-            builder = {
-                composable("auth_screen", content = { AuthScreen(navController = navController, viewModel = authViewModel) })
-        }) else NavigationHost(navController = navController, viewModel = viewModel)
+        if (!authViewModel.odooAuthenticated.value) AuthNavigationHost(navController = navController, viewModel = authViewModel)
+        else NavigationHost(navController = navController, viewModel = viewModel, authViewModel = authViewModel)
     }
 }
 
 @Composable
-fun NavigationHost(navController: NavController, viewModel: MainViewModel) {
+fun AuthNavigationHost(navController: NavController, viewModel: AuthViewModel) {
+    NavHost(navController = navController as NavHostController, startDestination = "auth_screen",
+        builder = {
+            composable("auth_screen",
+                content = { AuthScreen(navController = navController, viewModel = viewModel) })
+        })
+}
+
+@Composable
+fun NavigationHost(navController: NavController, viewModel: MainViewModel, authViewModel: AuthViewModel) {
     NavHost(
         navController = navController as NavHostController,
         startDestination = Screens.DrawerScreens.Home.route
@@ -165,7 +169,12 @@ fun NavigationHost(navController: NavController, viewModel: MainViewModel) {
         composable(Screens.HomeScreens.Favorite.route) { Favorite(viewModel = viewModel) }
         composable(Screens.HomeScreens.Notification.route) { Notification(viewModel = viewModel) }
         composable(Screens.HomeScreens.MyNetwork.route) { MyNetwork(viewModel = viewModel) }
-        composable(Screens.DrawerScreens.Account.route) { Account(viewModel = viewModel) }
+        composable(Screens.DrawerScreens.Account.route) {
+            authViewModel.clearCurrentAuthenticate()
+            authViewModel.switchParticle(Particle.SIGN_IN)
+            authViewModel.onOdooAuthenticated(false)
+//            Account(viewModel = viewModel)
+        }
         composable(Screens.DrawerScreens.Help.route) { Help(viewModel = viewModel) }
     }
 }

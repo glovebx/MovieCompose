@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skydoves.moviecompose.accounts.OdooManager
+import com.skydoves.moviecompose.models.OdooLogin
 import com.skydoves.moviecompose.models.network.NetworkState
 import com.skydoves.moviecompose.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,20 +39,26 @@ class AuthViewModel @Inject constructor(
         Timber.d("Injection AuthViewModel")
     }
 
-    private val _particle = mutableStateOf(Particle.SERVER_URL_INPUT)
+    private val _particle = mutableStateOf(Particle.AUTO_AUTHENTICATE)
     val particle: State<Particle> get() = _particle
 
     val switchParticle: (Particle) -> Unit = {
         _particle.value = it
     }
 
+    // 是否登录成功
+    private val _odooAuthenticated = mutableStateOf(false)
+    val odooAuthenticated: State<Boolean> get() = _odooAuthenticated
+    val onOdooAuthenticated: (Boolean) -> Unit = {
+        _odooAuthenticated.value = it
+    }
 
     private val _authLoadingState: MutableState<NetworkState> = mutableStateOf(NetworkState.IDLE)
     val authLoadingState: State<NetworkState> get() = _authLoadingState
 
-    private val _versionAndDatabaseSharedFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
-    val versionAndDatabaseFlow = _versionAndDatabaseSharedFlow.flatMapLatest {
-        if (it == "NULL") {
+    private val _versionAndDatabaseFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
+    val versionAndDatabaseFlow = _versionAndDatabaseFlow.flatMapLatest {
+        if (it.isNullOrEmpty()) {
             flow {
                 emit(null)
             }
@@ -63,25 +70,61 @@ class AuthViewModel @Inject constructor(
             )
         }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
-    fun fetchServerBasicInfo(url: String) = _versionAndDatabaseSharedFlow.tryEmit(url)
-    fun clearServerBasicInfo() = _versionAndDatabaseSharedFlow.tryEmit("NULL")
+    fun fetchServerBasicInfo(url: String) = _versionAndDatabaseFlow.tryEmit(url)
+    fun clearServerBasicInfo() = _versionAndDatabaseFlow.tryEmit("")
 
-    private val _databaseNameSharedFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
-    val databaseNameFlow = _databaseNameSharedFlow.flatMapLatest {
-        authRepository.setupDatabaseName(it)
+    private val _databaseNameFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
+    val databaseNameFlow = _databaseNameFlow.flatMapLatest {
+        if (it.isNullOrEmpty()) {
+            flow {
+                emit(null)
+            }
+        } else {
+            authRepository.setupDatabaseName(it)
+        }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
-    fun setupDatabaseName(db: String) = _databaseNameSharedFlow.tryEmit(db)
+    fun setupDatabaseName(db: String) = _databaseNameFlow.tryEmit(db)
+    fun clearDatabaseName() = _databaseNameFlow.tryEmit("")
 
-
-    private val _authenticateSharedFlow: MutableSharedFlow<Map<String, String>> = MutableSharedFlow(replay = 1)
-    val authenticateFlow = _authenticateSharedFlow.flatMapLatest {
-        _authLoadingState.value = NetworkState.LOADING
-        authRepository.authenticate(db = it["db"]!!, login = it["login"]!!, password = it["password"]!!,
-            success = { _authLoadingState.value = NetworkState.SUCCESS },
-            error = { _authLoadingState.value = NetworkState.ERROR }
-        )
+    // 用户名口令验证
+    private val _authenticateFlow: MutableSharedFlow<OdooLogin> = MutableSharedFlow(replay = 1)
+    val authenticateFlow = _authenticateFlow.flatMapLatest {
+        if (it.login.isNullOrEmpty()) {
+            flow {
+                emit(null)
+            }
+        } else {
+            _authLoadingState.value = NetworkState.LOADING
+            authRepository.authenticate(db = it.db, login = it.login, password = it.password,
+                success = { _authLoadingState.value = NetworkState.SUCCESS },
+                error = { _authLoadingState.value = NetworkState.ERROR }
+            )
+        }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
-    fun authenticate(db: String, login: String, password: String) = _authenticateSharedFlow.tryEmit(mapOf("db" to db, "login" to login, "password" to password))
+    fun authenticate(odooLogin: OdooLogin) = _authenticateFlow.tryEmit(odooLogin)
+
+    // 验证既存的有效账号
+    private val _authenticateCurrentFlow: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
+    val authenticateCurrentFlow = _authenticateCurrentFlow.flatMapLatest {
+        if (it == 0) {
+            flow {
+                emit(AuthenticateResult.SWITCH_ACCOUNT)
+            }
+        } else {
+            _authLoadingState.value = NetworkState.LOADING
+            authRepository.authenticate(
+                success = { _authLoadingState.value = NetworkState.SUCCESS }
+            )
+        }
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+    fun startCurrentAuthenticate(active: Int = 1) = _authenticateCurrentFlow.tryEmit(active)
+    fun clearCurrentAuthenticate() {
+        _authenticateCurrentFlow.tryEmit(0)
+        _authenticateFlow.tryEmit(OdooLogin("", "", "", ""))
+    }
+
 }
 
-enum class Particle { SERVER_URL_INPUT, DATABASE_INPUT, DATABASE_SELECT, SIGN_IN }
+enum class Particle { AUTO_AUTHENTICATE, SERVER_URL_INPUT, DATABASE_INPUT, DATABASE_SELECT, SIGN_IN }
+
+enum class AuthenticateResult { SESSION_EXPIRED, SWITCH_ACCOUNT, ACCOUNT_NOT_EXISTS, AUTHENTICATE_FAILED, AUTHENTICATED }

@@ -17,14 +17,20 @@
 package com.skydoves.moviecompose.network.service
 
 import com.skydoves.moviecompose.models.entities.Database
+import com.skydoves.moviecompose.models.entities.OdooAuthenticate
 import com.skydoves.moviecompose.models.entities.Version
 import com.skydoves.moviecompose.sandwich.JsonRpcCall
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthService {
+
+    @POST("/web/session/get_session_info")
+    @JsonRpcCall
+    @JvmSuppressWildcards
+    suspend fun fetchSessionInfo(@Body params: Map<String, Any>): ApiResponse<OdooAuthenticate>
+
     @POST("/web/webclient/version_info")
     @JsonRpcCall
     @JvmSuppressWildcards
@@ -38,5 +44,5 @@ interface AuthService {
     @POST("/web/session/authenticate")
     @JsonRpcCall
     @JvmSuppressWildcards
-    suspend fun authenticate(@Body params: Map<String, Any>): ApiResponse<String>
+    suspend fun authenticate(@Body params: Map<String, Any>): ApiResponse<OdooAuthenticate>
 }
