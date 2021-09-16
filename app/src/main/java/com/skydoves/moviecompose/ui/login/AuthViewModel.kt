@@ -21,9 +21,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.models.OdooLogin
-import com.skydoves.moviecompose.models.network.JsonRpcCallState
+import com.skydoves.moviecompose.models.network.TaskExecuteState
 import com.skydoves.moviecompose.models.network.NetworkState
 import com.skydoves.moviecompose.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,11 +53,8 @@ class AuthViewModel @Inject constructor(
         _odooAuthenticated.value = it
     }
 
-    private val _authLoadingState: MutableState<NetworkState> = mutableStateOf(NetworkState.IDLE)
-    val authLoadingState: State<NetworkState> get() = _authLoadingState
-
-    private val _jsonRpcCallState: MutableState<JsonRpcCallState> = mutableStateOf(JsonRpcCallState.IDLE)
-    val jsonRpcCallState: State<JsonRpcCallState> get() = _jsonRpcCallState
+    private val _taskExecuteState: MutableState<TaskExecuteState> = mutableStateOf(TaskExecuteState.IDLE)
+    val taskExecuteState: State<TaskExecuteState> get() = _taskExecuteState
 
     private val _versionAndDatabaseFlow: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
     val versionAndDatabaseFlow = _versionAndDatabaseFlow.flatMapLatest {
@@ -67,12 +63,10 @@ class AuthViewModel @Inject constructor(
                 emit(null)
             }
         } else {
-            _authLoadingState.value = NetworkState.LOADING
-            _jsonRpcCallState.value = JsonRpcCallState.LOADING
+            _taskExecuteState.value = TaskExecuteState.LOADING
             authRepository.loadVersionAndDatabaseInfo(url = it,
-                success = { _authLoadingState.value = NetworkState.SUCCESS },
-//                error = { _ -> _authLoadingState.value = NetworkState.ERROR }
-                error = { code, message -> _jsonRpcCallState.value = JsonRpcCallState.ERROR(code, message) }
+                success = { _taskExecuteState.value = TaskExecuteState.SUCCESS },
+                error = { code, message -> _taskExecuteState.value = TaskExecuteState.ERROR(code, message) }
             )
         }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
@@ -100,10 +94,9 @@ class AuthViewModel @Inject constructor(
                 emit(null)
             }
         } else {
-            _authLoadingState.value = NetworkState.LOADING
+            _taskExecuteState.value = TaskExecuteState.LOADING
             authRepository.authenticate(odooLogin = it,
-                success = { _authLoadingState.value = NetworkState.SUCCESS },
-                error = { _authLoadingState.value = NetworkState.ERROR }
+                success = { _taskExecuteState.value = TaskExecuteState.SUCCESS }
             )
         }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
@@ -117,9 +110,9 @@ class AuthViewModel @Inject constructor(
                 emit(null)
             }
         } else {
-            _authLoadingState.value = NetworkState.LOADING
+            _taskExecuteState.value = TaskExecuteState.LOADING
             authRepository.authenticate(
-                success = { _authLoadingState.value = NetworkState.SUCCESS }
+                success = { _taskExecuteState.value = TaskExecuteState.SUCCESS }
             )
         }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)

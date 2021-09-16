@@ -48,12 +48,14 @@ data class OdooAuthenticate(
   @NonNull var serverUrl: String,
   // 保留，本地不保存
   var password: String?,
-  var sessionId: String?
+  var sessionId: String?,
+  var cookie: String?
 ) {
 
   fun afterAuthenticated(serverUrl: String, sessionId: String?) {
     this.serverUrl = serverUrl
     this.sessionId = sessionId
+    this.cookie = "frontend_lang=${userContext.lang}; tz=${userContext.tz}; session_id=$sessionId"
     this.active = 1
   }
 //

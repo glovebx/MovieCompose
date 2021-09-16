@@ -22,13 +22,13 @@ import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.models.OdooLogin
 import com.skydoves.moviecompose.models.entities.OdooAuthenticate
 import com.skydoves.moviecompose.models.network.NetworkState
+import com.skydoves.moviecompose.models.network.TaskExecuteState
 import com.skydoves.moviecompose.models.network.onError
 import com.skydoves.moviecompose.models.network.onLoading
 
 @Composable
 fun LoginScreen(viewModel: AuthViewModel) {
-//    val context = LocalContext.current
-    val networkState: NetworkState by viewModel.authLoadingState
+    val taskExecuteState: TaskExecuteState by viewModel.taskExecuteState
     val authenticateResult: AuthenticateResult? by viewModel.authenticateFlow.collectAsState(initial = null)
 
     val email = remember { mutableStateOf(TextFieldValue()) }
@@ -128,6 +128,10 @@ fun LoginScreen(viewModel: AuthViewModel) {
         if (loginErrorState.value) {
             Text(text = "Login Failed", color = Color.Red)
         }
+        taskExecuteState.onError {
+            _, message ->
+            Text(text = message, color = Color.Red)
+        }
         Spacer(Modifier.size(16.dp))
         Button(
             onClick = {
@@ -178,8 +182,7 @@ fun LoginScreen(viewModel: AuthViewModel) {
         }
     }
 
-
-    networkState.onLoading {
+    taskExecuteState.onLoading {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {

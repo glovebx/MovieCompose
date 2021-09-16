@@ -19,6 +19,8 @@ package com.skydoves.moviecompose.repository
 import androidx.annotation.WorkerThread
 import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.exceptions.ApiException
+import com.skydoves.moviecompose.exceptions.NETWORK_EXCEPTION
+import com.skydoves.moviecompose.exceptions.NO_EXPECTED_DATA_EXCEPTION
 import com.skydoves.moviecompose.models.OdooLogin
 import com.skydoves.moviecompose.network.service.AuthService
 import com.skydoves.moviecompose.persistence.AuthDao
@@ -27,6 +29,7 @@ import com.skydoves.sandwich.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
+import java.io.IOException
 
 class AuthRepository constructor(
     private val authService: AuthService,
@@ -38,18 +41,29 @@ class AuthRepository constructor(
     }
 
     @WorkerThread
-    fun loadVersionAndDatabaseInfo(url: String, success: () -> Unit, error: (Int, String) -> Unit) = flow {
+    fun loadVersionAndDatabaseInfo(url: String, success: () -> Unit, error: (Long, String) -> Unit) = flow {
         OdooManager.serverUrl = url
         val params = mapOf<String, Any>()
-        val version = authService.fetchVersionInfo(params).getOrNull()
-        if (version == null) {
-            error(1, "")
-        } else {
-            // TODO: 判断是不是企业版
-            val databaseList = authService.fetchDatabaseList(params).getOrElse(listOf())
-            emit(databaseList)
+        val response = authService.fetchVersionInfo(params)
+        response.suspendOnSuccess {
+            if (data == null) {
+                error(NO_EXPECTED_DATA_EXCEPTION, "服务器连接失败")
+            } else {
+                // TODO: 判断是不是企业版
+                val databaseList = authService.fetchDatabaseList(params).getOrElse(listOf())
+                emit(databaseList)
+                success()
+            }
+        }.onException {
+            when (this.exception) {
+                is ApiException -> error((this.exception as ApiException).code,
+                    (message ?: "服务器连接失败"))
+                else -> error(NETWORK_EXCEPTION, "服务器连接失败")
+            }
+        }.onError {
+            error(NETWORK_EXCEPTION, message())
         }
-    }.onCompletion { success() }.flowOn(Dispatchers.IO)
+    }.flowOn(Dispatchers.IO)
 
     @WorkerThread
     fun setupDatabaseName(db: String) = flow {
@@ -61,23 +75,23 @@ class AuthRepository constructor(
     fun authenticate(
         odooLogin: OdooLogin,
         success: () -> Unit,
-        error: () -> Unit
     ) = flow {
         val params = mapOf<String, Any>("db" to odooLogin.db,
             "login" to odooLogin.login, "password" to odooLogin.password)
         val response = authService.authenticate(params)
         response.suspendOnSuccess {
             OdooManager.sessionId = headers["Set-Cookie"]?.split(";").let {
-                var sessionId: String = ""
+                var sessionId = ""
                 it?.forEach { it2 ->
                    val kv = it2.split("=")
-                    if (kv[0] == "session_id") {
-                        sessionId = kv[1]
+                    if (kv[0].trim() == "session_id") {
+                        sessionId = kv[1].trim()
                         return@forEach
                     }
                 }
                 sessionId
             }
+            // TODO: compose cookie string
             data.afterAuthenticated(OdooManager.serverUrl!!, OdooManager.sessionId)
 
             // TODO: 保存到数据库
@@ -94,16 +108,11 @@ class AuthRepository constructor(
             authDao.insertOdooAuthenticate(data)
 
             emit(AuthenticateResult.AUTHENTICATED)
-//        }.onError {
-//            error()
-//        }.onException { error()
+        }.suspendOnException {
+            emit(AuthenticateResult.AUTHENTICATE_FAILED)
+        }.suspendOnError {
+            emit(AuthenticateResult.AUTHENTICATE_FAILED)
         }
-            .suspendOnError {
-                emit(AuthenticateResult.AUTHENTICATE_FAILED)
-            }
-            .suspendOnException {
-                emit(AuthenticateResult.AUTHENTICATE_FAILED)
-            }
     }.onCompletion { success() }.flowOn(Dispatchers.IO)
 
     // 验证当前账号的sessionId是否还有效

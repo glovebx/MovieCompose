@@ -18,32 +18,32 @@ package com.skydoves.moviecompose.models.network
 
 import androidx.compose.runtime.Composable
 
-sealed class JsonRpcCallState {
-    object IDLE : JsonRpcCallState()
-    object LOADING : JsonRpcCallState()
-    object SUCCESS : JsonRpcCallState()
-    class ERROR(val code: Int, val message: String) : JsonRpcCallState()
+sealed class TaskExecuteState {
+    object IDLE : TaskExecuteState()
+    object LOADING : TaskExecuteState()
+    object SUCCESS : TaskExecuteState()
+    class ERROR(val code: Long, val message: String) : TaskExecuteState()
 }
 
 @Composable
-fun JsonRpcCallState.onSuccess(block: @Composable () -> Unit): JsonRpcCallState {
-  if (this == JsonRpcCallState.SUCCESS) {
+fun TaskExecuteState.onSuccess(block: @Composable () -> Unit): TaskExecuteState {
+  if (this == TaskExecuteState.SUCCESS) {
     block()
   }
   return this
 }
 
 @Composable
-fun JsonRpcCallState.onError(block: @Composable (Int, String) -> Unit): JsonRpcCallState {
-    if (this is JsonRpcCallState.ERROR) {
+fun TaskExecuteState.onError(block: @Composable (Long, String) -> Unit): TaskExecuteState {
+    if (this is TaskExecuteState.ERROR) {
         block(this.code, this.message)
     }
     return this
 }
 
 @Composable
-fun JsonRpcCallState.onLoading(block: @Composable () -> Unit): JsonRpcCallState {
-  if (this == JsonRpcCallState.LOADING) {
+fun TaskExecuteState.onLoading(block: @Composable () -> Unit): TaskExecuteState {
+  if (this == TaskExecuteState.LOADING) {
     block()
   }
   return this

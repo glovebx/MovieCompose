@@ -1,5 +1,6 @@
 package com.skydoves.moviecompose.ui.login
 
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
@@ -19,12 +21,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.models.entities.Database
-import com.skydoves.moviecompose.models.network.JsonRpcCallState
+import com.skydoves.moviecompose.models.network.TaskExecuteState
 import com.skydoves.moviecompose.models.network.NetworkState
 import com.skydoves.moviecompose.models.network.onError
 import com.skydoves.moviecompose.models.network.onLoading
 import com.skydoves.moviecompose.ui.theme.MovieComposeTheme
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -56,7 +57,7 @@ fun AuthScreen(navController: NavController, viewModel: AuthViewModel) {
 
 @Composable
 fun AutoAuthenticateScreen(viewModel: AuthViewModel) {
-    val networkState: NetworkState by viewModel.authLoadingState
+    val taskExecuteState: TaskExecuteState by viewModel.taskExecuteState
     val authenticateResult: AuthenticateResult? by viewModel.authenticateCurrentFlow.collectAsState(initial = null)
 
     LaunchedEffect(key1 = "") {
@@ -102,7 +103,7 @@ fun AutoAuthenticateScreen(viewModel: AuthViewModel) {
         }, fontSize = 30.sp)
     }
 
-    networkState.onLoading {
+    taskExecuteState.onLoading {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -116,11 +117,8 @@ fun AutoAuthenticateScreen(viewModel: AuthViewModel) {
 
 @Composable
 fun ServerUrlScreen(viewModel: AuthViewModel) {
-//    val context = LocalContext.current
-    val networkState: NetworkState by viewModel.authLoadingState
+    val taskExecuteState: TaskExecuteState by viewModel.taskExecuteState
     val databaseList: List<Database>? by viewModel.versionAndDatabaseFlow.collectAsState(initial = null)
-
-    val jsonRpcCallState: JsonRpcCallState by viewModel.jsonRpcCallState
 
     if (databaseList != null) {
         when (databaseList?.size) {
@@ -195,7 +193,10 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
         if (serverUrlErrorState.value) {
             Text(text = "Required", color = Color.Red)
         }
-
+        taskExecuteState.onError {
+                _, message ->
+            Text(text = message, color = Color.Red)
+        }
         Spacer(Modifier.size(16.dp))
         Button(
             onClick = {
@@ -226,16 +227,12 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
 //    networkState.onError {
 //        serverUrlErrorState.value = true
 //    }
+//    taskExecuteState.onError {
+//            _, message ->
+//        Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
+//    }
 
-    jsonRpcCallState.onError {
-        code, message -> if (code == 1) {
-
-    } else {
-
-    }
-    }
-
-    networkState.onLoading {
+    taskExecuteState.onLoading {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -245,6 +242,17 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
             )
         }
     }
+//
+//    networkState.onLoading {
+//        Box(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//
+//            CircularProgressIndicator(
+//                modifier = Modifier.align(Alignment.Center)
+//            )
+//        }
+//    }
 }
 
 @Composable
