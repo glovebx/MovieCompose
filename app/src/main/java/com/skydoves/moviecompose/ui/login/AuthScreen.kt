@@ -15,6 +15,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -223,14 +224,6 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
         )
     }
-//
-//    networkState.onError {
-//        serverUrlErrorState.value = true
-//    }
-//    taskExecuteState.onError {
-//            _, message ->
-//        Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
-//    }
 
     taskExecuteState.onLoading {
         Box(
@@ -242,17 +235,6 @@ fun ServerUrlScreen(viewModel: AuthViewModel) {
             )
         }
     }
-//
-//    networkState.onLoading {
-//        Box(
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//
-//            CircularProgressIndicator(
-//                modifier = Modifier.align(Alignment.Center)
-//            )
-//        }
-//    }
 }
 
 @Composable
@@ -296,6 +278,10 @@ fun DatabaseInputScreen(viewModel: AuthViewModel) {
             }
         }, fontSize = 30.sp)
         Spacer(Modifier.size(16.dp))
+
+        Text(text = OdooManager.serverUrl!!, modifier = Modifier.fillMaxWidth(), color = Color.Blue, textAlign = TextAlign.Center)
+        Spacer(Modifier.size(16.dp))
+
         OutlinedTextField(
             value = databaseName.value,
             keyboardOptions = KeyboardOptions(

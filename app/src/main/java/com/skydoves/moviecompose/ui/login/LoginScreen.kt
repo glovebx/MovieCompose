@@ -15,6 +15,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,6 +72,12 @@ fun LoginScreen(viewModel: AuthViewModel) {
             }
         }, fontSize = 30.sp)
         Spacer(Modifier.size(16.dp))
+
+        Text(text = OdooManager.serverUrl!!, modifier = Modifier.fillMaxWidth(), color = Color.Blue, textAlign = TextAlign.Center)
+        Spacer(Modifier.size(16.dp))
+        Text(text = OdooManager.db!!, modifier = Modifier.fillMaxWidth(), color = Color.Blue, textAlign = TextAlign.Center)
+        Spacer(Modifier.size(16.dp))
+
         OutlinedTextField(
             value = email.value,
             onValueChange = {
