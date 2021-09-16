@@ -71,6 +71,13 @@ class AuthRepository constructor(
         emit(db)
     }.flowOn(Dispatchers.IO)
 
+
+    @WorkerThread
+    fun loadCurrentAccount() = flow {
+        val odooAuthenticate = authDao.getCurrentOdooAuthenticate()
+        emit(odooAuthenticate)
+    }.flowOn(Dispatchers.IO)
+
     @WorkerThread
     fun authenticate(
         odooLogin: OdooLogin,

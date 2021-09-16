@@ -1,8 +1,12 @@
 package com.skydoves.moviecompose.ui.main
 
+import android.os.Build
+import android.webkit.WebSettings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -11,11 +15,17 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.skydoves.moviecompose.accounts.OdooManager
+import com.skydoves.moviecompose.models.entities.Database
+import com.skydoves.moviecompose.models.entities.OdooAuthenticate
+import com.skydoves.moviecompose.ui.components.CustomWebView
 import timber.log.Timber
 
 sealed class Screens(val route: String, val title: String) {
@@ -58,12 +68,44 @@ val screensFromDrawer = listOf(
 @Composable
 fun Home(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     viewModel.setCurrentScreen(Screens.DrawerScreens.Home)
+    val account: OdooAuthenticate? by viewModel.currentAccountFlow.collectAsState(initial = null)
+
+    LaunchedEffect(key1 = "" ) {
+        viewModel.loadCurrentAccount()
+    }
+
     Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxSize(),
+//        verticalArrangement = Arrangement.Center,
+//        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Home.", style = MaterialTheme.typography.h4)
+
+        account?.cookie?.let {
+            CustomWebView(
+                modifier = Modifier.fillMaxSize(),
+                url = "${OdooManager.serverUrl!!}",
+                cookie = it,
+                onProgressChange = { progress ->
+//                rememberWebViewProgress = progress
+                    Timber.d("onProgressChange: $progress")
+                },
+                onBack = { webView ->
+                    if (webView?.canGoBack() == true) {
+                        webView.goBack()
+                    } else {
+//                    finish()
+                    }
+                },
+                onReceivedError = { error ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Timber.d("onReceivedError: ${error?.description}")
+                    }
+                }
+            )
+        }
     }
 }
 

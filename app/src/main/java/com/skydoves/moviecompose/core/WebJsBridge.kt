@@ -10,10 +10,11 @@ import timber.log.Timber
 
 const val JS_BRIDGE_NAME = "OdooDeviceUtility"
 
-class WebJsBridge (val webView: WebView, val webAddonsRepository: WebAddonsRepository) {
+@Deprecated("nouse")
+class WebJsBridge (private val webView: WebView, private val webAddonsRepository: WebAddonsRepository) {
 
     @JavascriptInterface
-    fun execute(name: String, args: String?, id: String) {
+    fun execute(name: String, args: String?, id: String?) {
         Timber.d("$JS_BRIDGE_NAME, Executing: $name; Args: $args, Callback: $id")
         try {
             // base.crashManager(...)

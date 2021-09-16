@@ -9,19 +9,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import com.skydoves.moviecompose.core.WVJBWebView
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun CustomWebView(
     modifier: Modifier = Modifier,
     url: String,
-    onBack: (webView: WebView?) -> Unit,
+    cookie: String,
+    onBack: (webView: WVJBWebView?) -> Unit,
     onProgressChange: (progress: Int) -> Unit = {},
     initSettings: (webSettings: WebSettings?) -> Unit = {},
     onReceivedError: (error: WebResourceError?) -> Unit = {}
 ) {
     val webViewChromeClient = object : WebChromeClient() {
-        override fun onProgressChanged(view: WebView?, newProgress: Int) {
+        override fun onProgressChanged(view: WebView, newProgress: Int) {
             //回调网页内容加载进度
             onProgressChange(newProgress)
             super.onProgressChanged(view, newProgress)
@@ -29,24 +32,24 @@ fun CustomWebView(
     }
     val webViewClient = object : WebViewClient() {
         override fun onPageStarted(
-            view: WebView?, url: String?,
+            view: WebView, url: String?,
             favicon: Bitmap?
         ) {
             super.onPageStarted(view, url, favicon)
             onProgressChange(-1)
         }
 
-        override fun onPageFinished(view: WebView?, url: String?) {
+        override fun onPageFinished(view: WebView, url: String?) {
             super.onPageFinished(view, url)
             onProgressChange(100)
         }
 
         override fun shouldOverrideUrlLoading(
-            view: WebView?,
+            view: WebView,
             request: WebResourceRequest?
         ): Boolean {
-            if (null == request?.url) return false
-            val showOverrideUrl = request.url.toString()
+//            if (null == request?.url) return false
+            val showOverrideUrl = request?.url?.toString() ?: return false
             try {
                 if (!showOverrideUrl.startsWith("http://", true)
                     && !showOverrideUrl.startsWith("https://", true)
@@ -59,6 +62,7 @@ fun CustomWebView(
                     return true
                 }
             } catch (e: Exception) {
+                Timber.e(e)
                 //没有安装和找到能打开(「xxxx://openlink.cc....」、「weixin://xxxxx」等)协议的应用
                 return true
             }
@@ -75,18 +79,20 @@ fun CustomWebView(
             onReceivedError(error)
         }
     }
-    var webView: WebView? = null
-    val coroutineScope = rememberCoroutineScope()
+    var webView: WVJBWebView? = null
     AndroidView(modifier = modifier, factory = { context ->
-        WebView(context).apply {
+        WVJBWebView(context).apply {
             this.webViewClient = webViewClient
             this.webChromeClient = webViewChromeClient
             //回调webSettings供调用方设置webSettings的相关配置
             initSettings(this.settings)
+            this.injectCookie(url, cookie)
             webView = this
             loadUrl(url)
         }
     })
+
+    val coroutineScope = rememberCoroutineScope()
     BackHandler {
         coroutineScope.launch {
             //自行控制点击了返回按键之后，关闭页面还是返回上一级网页

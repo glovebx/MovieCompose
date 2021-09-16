@@ -21,7 +21,7 @@ class WebAddonsRepository(
         addons.firstOrNull { it.aliasName == aliasName }?.let { webAddon ->
             {
                 if (webAddon.permissions?.isNotEmpty() == true) {
-                    // 检查权限，没有则动态申请
+                    // TODO: 检查权限，没有则动态申请
                 }
                 webAddon.methodMetas[name]?.let { methodMeta ->
                     {

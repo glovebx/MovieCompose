@@ -101,6 +101,7 @@ fun MovieDetailScreen(
             CustomWebView(
                 modifier = Modifier.fillMaxSize(),
                 url = this,
+                cookie = "",
                 onProgressChange = { progress ->
                     rememberWebViewProgress = progress
                 },
