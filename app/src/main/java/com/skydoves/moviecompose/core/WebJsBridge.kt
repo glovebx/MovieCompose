@@ -1,8 +1,8 @@
 package com.skydoves.moviecompose.core
 
 import android.webkit.JavascriptInterface
-import android.webkit.WebView
 import com.skydoves.moviecompose.addons.WebAddonsRepository
+import com.tencent.smtt.sdk.WebView
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

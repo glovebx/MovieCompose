@@ -12,11 +12,13 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.*
-import android.webkit.WebStorage.QuotaUpdater
+import android.webkit.JavascriptInterface
+import com.tencent.smtt.sdk.*
+import com.tencent.smtt.sdk.WebStorage.QuotaUpdater
 import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
 import com.skydoves.moviecompose.addons.WebAddonsRepository
+import com.tencent.smtt.export.external.interfaces.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -53,11 +55,11 @@ class WVJBWebView : WebView {
                     EXEC_SCRIPT -> _evaluateJavascriptOnMain(msg.obj as String)
                     LOAD_URL -> super@WVJBWebView.loadUrl((msg.obj as String))
                     LOAD_URL_WITH_HEADERS -> {
-                        (msg.obj as UrlRequestWithHeaders)?.let {
+                        (msg.obj as UrlRequestWithHeaders).let {
                             super@WVJBWebView.loadUrl(it.url, it.headers)
                         }
                     }
-                    HANDLE_MESSAGE -> (msg.obj as UrlRequestWithOdoo)?.let {
+                    HANDLE_MESSAGE -> (msg.obj as UrlRequestWithOdoo).let {
                         this@WVJBWebView.handleOdooMessage(it.name, it.args, it.id)
                     }
                 }
@@ -146,7 +148,7 @@ class WVJBWebView : WebView {
 //    }
 
     fun <T, R> registerHandler(handlerName: String, handler: WVJBHandler<T, R>?) {
-        if (handlerName.isNullOrEmpty() || handler == null) {
+        if (handlerName.isEmpty() || handler == null) {
             return
         }
         messageHandlers[handlerName] = handler
@@ -204,7 +206,7 @@ class WVJBWebView : WebView {
             // barcode.scanBarcode(...)
             val split = name.split("\\.")
             if (split.size > 1) {
-                webAddonsRepository.exec(this, split[0], split[1], JSONObject(args), id)
+                webAddonsRepository.exec(this, split[0], split[1], JSONObject(args ?: ""), id)
             }
         } catch (e: JSONException) {
             Timber.e(e)
@@ -219,9 +221,7 @@ class WVJBWebView : WebView {
             if (message.responseId != null) {
                 val responseCallback =
                     responseCallbacks.remove(message.responseId) as WVJBResponseCallback<Any>
-                responseCallback?.let {
-                    it.onResult(message.responseData ?: "")
-                }
+                responseCallback?.onResult(message.responseData ?: "")
 
             } else {
                 var responseCallback: WVJBResponseCallback<Any>? = null
@@ -455,7 +455,7 @@ class WVJBWebView : WebView {
                 ?: super.onReceivedTouchIconUrl(view, url, precomposed)
         }
 
-        override fun onShowCustomView(view: View, callback: CustomViewCallback?) {
+        override fun onShowCustomView(view: View, callback: IX5WebChromeClient.CustomViewCallback?) {
             newWebChromeClient?.onShowCustomView(view, callback) ?: super.onShowCustomView(
                 view,
                 callback
@@ -464,7 +464,7 @@ class WVJBWebView : WebView {
 
         override fun onShowCustomView(
             view: View, requestedOrientation: Int,
-            callback: CustomViewCallback?
+            callback: IX5WebChromeClient.CustomViewCallback?
         ) {
             newWebChromeClient?.onShowCustomView(view, requestedOrientation, callback)
                 ?: super.onShowCustomView(view, requestedOrientation, callback)
@@ -838,23 +838,26 @@ class WVJBWebView : WebView {
 
     // 程序通用的初始设置
     fun setUp() {
-        this.settings.let {
-            it.domStorageEnabled = true
-            it.cacheMode = WebSettings.LOAD_NO_CACHE
-            it.javaScriptCanOpenWindowsAutomatically = true
-            it.javaScriptEnabled = true
+        this.settings.run {
+            //缩放至屏幕的大小
+            loadWithOverviewMode = true
+
+            domStorageEnabled = true
+            cacheMode = WebSettings.LOAD_NO_CACHE
+            javaScriptCanOpenWindowsAutomatically = true
+            javaScriptEnabled = true
             //设置true,才能让Webivew支持<meta>标签的viewport属性
-            it.useWideViewPort = true
+            useWideViewPort = true
 
             //设置可以支持缩放
-            it.setSupportZoom(true)
+            setSupportZoom(true)
             //设置出现缩放工具
-            it.builtInZoomControls = true
+            builtInZoomControls = true
             //设定缩放控件隐藏
-            it.displayZoomControls = false
-            it.loadsImagesAutomatically = true
+            displayZoomControls = true
+            loadsImagesAutomatically = true
             // 不保存Form框条的数据
-            it.saveFormData = false
+            saveFormData = false
         }
 
 ////         改变ua

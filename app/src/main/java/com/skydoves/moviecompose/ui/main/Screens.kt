@@ -2,9 +2,8 @@ package com.skydoves.moviecompose.ui.main
 
 import android.os.Build
 import android.webkit.WebSettings
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -21,7 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import com.skydoves.moviecompose.accounts.OdooManager
 import com.skydoves.moviecompose.models.entities.Database
 import com.skydoves.moviecompose.models.entities.OdooAuthenticate
@@ -77,20 +78,41 @@ fun Home(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
-            .fillMaxSize(),
+            .fillMaxSize()
+//            .width(300.dp).height(500.dp)
+            .background(Color.Gray),
+
 //        verticalArrangement = Arrangement.Center,
 //        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Home.", style = MaterialTheme.typography.h4)
 
-        account?.cookie?.let {
+//        account?.cookie?.let {
             CustomWebView(
                 modifier = Modifier.fillMaxSize(),
                 url = "${OdooManager.serverUrl!!}",
-                cookie = it,
+                cookie = "",
                 onProgressChange = { progress ->
 //                rememberWebViewProgress = progress
                     Timber.d("onProgressChange: $progress")
+                },
+                initSettings = { settings ->
+                    settings?.apply {
+                        //支持js交互
+                        javaScriptEnabled = true
+                        //将图片调整到适合webView的大小
+                        useWideViewPort = true
+                        //缩放至屏幕的大小
+                        loadWithOverviewMode = true
+                        //缩放操作
+                        setSupportZoom(true)
+                        builtInZoomControls = true
+                        displayZoomControls = false
+                        //是否支持通过JS打开新窗口
+                        javaScriptCanOpenWindowsAutomatically = true
+                        //不加载缓存内容
+                        cacheMode = WebSettings.LOAD_NO_CACHE
+                    }
                 },
                 onBack = { webView ->
                     if (webView?.canGoBack() == true) {
@@ -105,7 +127,7 @@ fun Home(modifier: Modifier = Modifier, viewModel: MainViewModel) {
                     }
                 }
             )
-        }
+//        }
     }
 }
 

@@ -1,6 +1,6 @@
 package com.skydoves.moviecompose.core
 
-import android.webkit.WebView
+import com.tencent.smtt.sdk.WebView
 import org.json.JSONObject
 
 class WebAddonCallback(private val webView: WebView, private val callbackId: String) {

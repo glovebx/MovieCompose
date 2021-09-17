@@ -122,7 +122,8 @@ fun MovieDetailScreen(
                         //不加载缓存内容
                         cacheMode = WebSettings.LOAD_NO_CACHE
                     }
-                }, onBack = { webView ->
+                },
+                onBack = { webView ->
                     if (webView?.canGoBack() == true) {
                         webView.goBack()
                     } else {

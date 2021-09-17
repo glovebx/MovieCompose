@@ -3,13 +3,18 @@ package com.skydoves.moviecompose.ui.components
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.webkit.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.skydoves.moviecompose.core.WVJBWebView
+import com.tencent.smtt.export.external.interfaces.WebResourceError
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
+import com.tencent.smtt.sdk.WebChromeClient
+import com.tencent.smtt.sdk.WebSettings
+import com.tencent.smtt.sdk.WebView
+import com.tencent.smtt.sdk.WebViewClient
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -18,7 +23,7 @@ fun CustomWebView(
     modifier: Modifier = Modifier,
     url: String,
     cookie: String,
-    onBack: (webView: WVJBWebView?) -> Unit,
+    onBack: (webView: WebView?) -> Unit,
     onProgressChange: (progress: Int) -> Unit = {},
     initSettings: (webSettings: WebSettings?) -> Unit = {},
     onReceivedError: (error: WebResourceError?) -> Unit = {}
@@ -30,6 +35,7 @@ fun CustomWebView(
             super.onProgressChanged(view, newProgress)
         }
     }
+
     val webViewClient = object : WebViewClient() {
         override fun onPageStarted(
             view: WebView, url: String?,
@@ -70,7 +76,7 @@ fun CustomWebView(
         }
 
         override fun onReceivedError(
-            view: WebView?,
+            view: WebView,
             request: WebResourceRequest?,
             error: WebResourceError?
         ) {
@@ -79,16 +85,17 @@ fun CustomWebView(
             onReceivedError(error)
         }
     }
-    var webView: WVJBWebView? = null
+    var webView: WebView? = null
     AndroidView(modifier = modifier, factory = { context ->
-        WVJBWebView(context).apply {
+        WebView(context).apply {
             this.webViewClient = webViewClient
             this.webChromeClient = webViewChromeClient
             //回调webSettings供调用方设置webSettings的相关配置
             initSettings(this.settings)
-            this.injectCookie(url, cookie)
+//            this.setUp()
+//            this.injectCookie(url, cookie)
             webView = this
-            loadUrl(url)
+            loadUrl("https://www.odoo.com")
         }
     })
 

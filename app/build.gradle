@@ -97,6 +97,8 @@ android {
 }
 
 dependencies {
+    api 'com.tencent.tbs:tbssdk:44085'
+
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
   // material
   implementation "com.google.android.material:material:$versions.materialVersion"

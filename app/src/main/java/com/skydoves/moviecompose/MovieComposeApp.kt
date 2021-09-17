@@ -17,7 +17,31 @@
 package com.skydoves.moviecompose
 
 import android.app.Application
+import com.tencent.smtt.export.external.TbsCoreSettings
+import com.tencent.smtt.sdk.QbSdk
 import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
 
 @HiltAndroidApp
-class MovieComposeApp : Application()
+class MovieComposeApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        val params = mapOf(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER to true,
+            TbsCoreSettings.TBS_SETTINGS_USE_DEXLOADER_SERVICE to true)
+        QbSdk.initTbsSettings(params)
+
+        QbSdk.initX5Environment(applicationContext, object: QbSdk.PreInitCallback {
+            override fun onCoreInitFinished() {
+//                TODO("Not yet implemented")
+                Timber.d("onCoreInitFinished")
+            }
+
+            override fun onViewInitFinished(p0: Boolean) {
+//                TODO("Not yet implemented")
+                Timber.d("onViewInitFinished")
+            }
+
+        })
+    }
+}

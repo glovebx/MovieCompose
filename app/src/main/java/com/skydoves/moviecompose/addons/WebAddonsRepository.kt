@@ -1,6 +1,6 @@
 package com.skydoves.moviecompose.addons
 
-import android.webkit.WebView
+import com.tencent.smtt.sdk.WebView
 import com.skydoves.moviecompose.core.WebAddon
 import com.skydoves.moviecompose.core.WebAddonArgs
 import com.skydoves.moviecompose.core.WebAddonCallback
