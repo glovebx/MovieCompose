@@ -23,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.skydoves.moviecompose.accounts.OdooManager
+import com.skydoves.moviecompose.addons.WebAddonsRepository
 import com.skydoves.moviecompose.models.entities.Database
 import com.skydoves.moviecompose.models.entities.OdooAuthenticate
 import com.skydoves.moviecompose.ui.components.CustomWebView
@@ -90,8 +92,10 @@ fun Home(modifier: Modifier = Modifier, viewModel: MainViewModel) {
 //        account?.cookie?.let {
             CustomWebView(
                 modifier = Modifier.fillMaxSize(),
-                url = "${OdooManager.serverUrl!!}",
+//                url = "${OdooManager.serverUrl!!}",
+                url = "file:///android_asset/image_detail.html",
                 cookie = "",
+                viewModel = viewModel,
                 onProgressChange = { progress ->
 //                rememberWebViewProgress = progress
                     Timber.d("onProgressChange: $progress")

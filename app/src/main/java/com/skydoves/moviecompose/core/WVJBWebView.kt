@@ -13,12 +13,12 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
-import com.tencent.smtt.sdk.*
-import com.tencent.smtt.sdk.WebStorage.QuotaUpdater
 import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
-import com.skydoves.moviecompose.addons.WebAddonsRepository
+import com.skydoves.moviecompose.ui.main.MainViewModel
 import com.tencent.smtt.export.external.interfaces.*
+import com.tencent.smtt.sdk.*
+import com.tencent.smtt.sdk.WebStorage.QuotaUpdater
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -26,8 +26,6 @@ import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.lang.ref.WeakReference
-import javax.inject.Inject
-
 
 class WVJBWebView : WebView {
 
@@ -104,8 +102,9 @@ class WVJBWebView : WebView {
 //         */
 //        fun onClose(): Boolean
 //    }
-    @Inject
-    lateinit var webAddonsRepository: WebAddonsRepository
+//    @Inject
+//    lateinit var webAddonsRepository: WebAddonsRepository
+    lateinit var viewModel: MainViewModel
 
     private var startupMessageQueue: ArrayList<WVJBMessage>? = null
     private var uniqueId: Long = 0
@@ -204,9 +203,10 @@ class WVJBWebView : WebView {
         try {
             // base.crashManager(...)
             // barcode.scanBarcode(...)
-            val split = name.split("\\.")
+            val split = name.split(".")
             if (split.size > 1) {
-                webAddonsRepository.exec(this, split[0], split[1], JSONObject(args ?: ""), id)
+//                viewModel.webAddonsRepository.exec(this, split[0], split[1], JSONObject(args ?: ""), id)
+                viewModel.odooAddonsExec(this, split[0], split[1], JSONObject(args ?: ""), id)
             }
         } catch (e: JSONException) {
             Timber.e(e)
@@ -837,7 +837,8 @@ class WVJBWebView : WebView {
     }
 
     // 程序通用的初始设置
-    fun setUp() {
+    fun setUp(viewModel: MainViewModel) {
+        this.viewModel = viewModel
         this.settings.run {
             //缩放至屏幕的大小
             loadWithOverviewMode = true
@@ -854,7 +855,7 @@ class WVJBWebView : WebView {
             //设置出现缩放工具
             builtInZoomControls = true
             //设定缩放控件隐藏
-            displayZoomControls = true
+            displayZoomControls = false
             loadsImagesAutomatically = true
             // 不保存Form框条的数据
             saveFormData = false
@@ -923,7 +924,8 @@ class WVJBWebView : WebView {
         @JavascriptInterface
         fun list_plugins(): String? {
             val jsonArray = JSONArray()
-            webAddonsRepository.addons.forEach { webAddon ->
+//            viewModel.webAddonsRepository.addons.forEach { webAddon ->
+            viewModel.getOdooAddons().forEach { webAddon ->
                 webAddon.methodMetas.values.forEach { methodMeta ->
                     val jsonObject = JSONObject()
                     jsonObject.put("name", methodMeta.name)

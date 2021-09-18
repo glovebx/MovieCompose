@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.skydoves.moviecompose.core.WVJBWebView
+import com.skydoves.moviecompose.ui.main.MainViewModel
 import com.tencent.smtt.export.external.interfaces.WebResourceError
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest
 import com.tencent.smtt.sdk.WebChromeClient
@@ -23,6 +24,7 @@ fun CustomWebView(
     modifier: Modifier = Modifier,
     url: String,
     cookie: String,
+    viewModel: MainViewModel?,
     onBack: (webView: WebView?) -> Unit,
     onProgressChange: (progress: Int) -> Unit = {},
     initSettings: (webSettings: WebSettings?) -> Unit = {},
@@ -85,17 +87,17 @@ fun CustomWebView(
             onReceivedError(error)
         }
     }
-    var webView: WebView? = null
+    var webView: WVJBWebView? = null
     AndroidView(modifier = modifier, factory = { context ->
-        WebView(context).apply {
+        WVJBWebView(context).apply {
             this.webViewClient = webViewClient
             this.webChromeClient = webViewChromeClient
             //回调webSettings供调用方设置webSettings的相关配置
             initSettings(this.settings)
-//            this.setUp()
+            this.setUp(viewModel!!)
 //            this.injectCookie(url, cookie)
             webView = this
-            loadUrl("https://www.odoo.com")
+            loadUrl(url)
         }
     })
 

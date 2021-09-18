@@ -31,7 +31,7 @@ object OdooRepositoryModule {
 
     @Provides
     @ViewModelScoped
-    fun provideWebAddonRepository(
+    fun provideWebAddonsRepository(
       baseAddon: BaseAddon,
       barcodeAddon: BarcodeAddon
     ): WebAddonsRepository {

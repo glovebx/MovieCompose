@@ -7,11 +7,11 @@ import timber.log.Timber
 
 class BaseAddon(override val context: Context): WebAddon(context = context, "base") {
 
-    fun crashManager(webAddonArgs: WebAddonArgs) {
+    fun crashManager(webAddonArgs: WebAddonArgs?) {
 //        val str: String = WebPlugin.TAG
 //        Log.e(str, "crashManager() ERROR CODE : " + webAddonArgs.getString("code"))
-        Timber.d("CrashManager error code: ${webAddonArgs.asString("code")}")
-        val map: WebAddonArgs = webAddonArgs.asWebAddonArgs("data")
+        Timber.d("CrashManager error code: ${webAddonArgs?.asString("code")}")
+        val map: WebAddonArgs = webAddonArgs?.asWebAddonArgs("data") ?: return
         if (map.containsKey("name")) {
             val exceptionName: String = map.asString("name")
 //                Log.d("$str:crashManager()", string)

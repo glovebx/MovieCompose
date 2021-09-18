@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
+import com.skydoves.moviecompose.addons.WebAddonsRepository
 import com.skydoves.moviecompose.models.entities.Movie
 import com.skydoves.moviecompose.models.entities.Person
 import com.skydoves.moviecompose.models.entities.Tv
@@ -30,10 +31,12 @@ import com.skydoves.moviecompose.models.network.TaskExecuteState
 import com.skydoves.moviecompose.repository.AuthRepository
 import com.skydoves.moviecompose.repository.DiscoverRepository
 import com.skydoves.moviecompose.repository.PeopleRepository
+import com.tencent.smtt.sdk.WebView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +44,8 @@ class MainViewModel @Inject constructor(
     val imageLoader: ImageLoader,
     private val authRepository: AuthRepository,
     private val discoverRepository: DiscoverRepository,
-    private val peopleRepository: PeopleRepository
+    private val peopleRepository: PeopleRepository,
+    private val webAddonsRepository: WebAddonsRepository,
 ) : ViewModel() {
 
     private val _clickCount = mutableStateOf(0)
@@ -162,4 +166,10 @@ class MainViewModel @Inject constructor(
             peoplePageStateFlow.value++
         }
     }
+
+    fun odooAddonsExec(webView: WebView, aliasName: String, name: String, jsonObject: JSONObject?, id: String?) {
+        webAddonsRepository.exec(webView, aliasName, name, jsonObject, id)
+    }
+
+    fun getOdooAddons() = webAddonsRepository.addons
 }

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/>
+    <title></title>
+</head>
+<body>
+<style>
+      img{
+          width: 100%;
+      }
+</style>
+<div id="img_box">
+    正在加载...
+</div>
+
+<div id="btn_box" style="margin-top:100px">
+    <div id="btn_scan">扫码测试</div>
+</div>
+
+</body>
+</html>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js"></script>
+<script type="text/javascript">
+var docReady = function(fn) {
+    // see if DOM is already available
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        // call on next available tick
+        setTimeout(fn, 1);
+    } else {
+        document.addEventListener("DOMContentLoaded", fn);
+    }
+}
+
+var odooMain = function () {
+    var imgBox = document.getElementById("img_box");
+    //imgBox.append("START!!");
+
+    var available = typeof OdooDeviceUtility !== 'undefined';
+    var DeviceUtility;
+    var deferreds = {};
+    var methods = {};
+
+
+    if (available){
+        imgBox.append("OdooDeviceUtility available");
+        DeviceUtility = OdooDeviceUtility;
+        delete window.OdooDeviceUtility;
+    } else {
+        imgBox.append("OdooDeviceUtility NOT available");
+    }
+
+    var scanListener = function handleClick(event){
+        imgBox.append("SCAN START!!!!");
+        if (methods.scanBarcode) {
+            imgBox.append("==methods.scanBarcode==");
+        } else {
+            imgBox.append("***methods.scanBarcode NOT exists***");
+        }
+
+        methods.scanBarcode().then(function(result) {
+            imgBox.append("SCAN DONE!!!!");
+        });
+    }
+
+    var btnScan = document.getElementById("btn_scan");
+    btnScan.addEventListener('click', scanListener, true);
+
+    function native_invoke(name, args) {
+        imgBox.append("==native_invoke1==");
+        if(_.isUndefined(args)){
+            args = {};
+        }
+        imgBox.append("==native_invoke2==");
+        var id = _.uniqueId();
+        imgBox.append(args);
+        imgBox.append("==native_invoke3==");
+        args = JSON.stringify(args);
+        DeviceUtility.execute(name, args, id);
+        return new Promise(function (resolve, reject) {
+            deferreds[id] = {
+                successCallback: resolve,
+                errorCallback: reject
+            };
+        });
+    }
+
+    var plugins_str = DeviceUtility.list_plugins();
+    imgBox.append(plugins_str);
+
+    var plugins = JSON.parse(plugins_str);
+    _.each(plugins, function (plugin) {
+        imgBox.append(plugin.name);
+        methods[plugin.name] = function (args) {
+            return native_invoke(plugin.action, args);
+        };
+    });
+
+    window.odoo.native_notify = function (id, result) {
+        if (deferreds.hasOwnProperty(id)) {
+            if (result.success) {
+                deferreds[id].successCallback(result);
+            } else {
+                deferreds[id].errorCallback(result);
+            }
+        }
+    };
+};
+
+docReady(odooMain);
+
+
+</script>

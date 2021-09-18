@@ -128,7 +128,13 @@ dependencies {
   // compose compatibles
   implementation "com.github.skydoves:orchestra-balloon:$versions.orchestraVersion"
 
-  // architecture components
+  // permission
+  implementation 'com.guolindev.permissionx:permissionx:1.5.1'
+
+  // huawei hms
+//  implementation 'com.huawei.hms:scanplus:1.1.1.301'
+
+    // architecture components
   implementation "androidx.core:core-ktx:+"
   implementation "androidx.fragment:fragment-ktx:$versions.fragmentVersion"
   implementation "androidx.lifecycle:lifecycle-extensions:$versions.lifecycleVersion"
